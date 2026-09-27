@@ -1,0 +1,44 @@
+WEB NA KONTROLU KAMPANÍ KVALITY (TU) – NÁVOD
+============================================
+
+Súbory na web (nahrať do GitHub repozitára):
+  index.html  – stránka pre dealerov (prihlásenie + vyhľadávanie VIN)
+  admin.html  – pomocná stránka na týždennú aktualizáciu (bez dát, nič neodosiela)
+  data.json   – ZAŠIFROVANÝ zoznam VIN (bez správneho ID + PIN sa nedá prečítať)
+
+NIKDY nenahrávať na web: ID_a_PIN_pre_TUweb.xlsx (obsahuje PINy) a pôvodné Excely.
+
+
+1) PRVÉ ZVEREJNENIE – GitHub Pages (zadarmo)
+--------------------------------------------
+ 1. Zaregistrujte sa na https://github.com (ak ešte nemáte účet).
+ 2. Vpravo hore „+“ → New repository. Názov napr. "tu-kampane", zvoľte Public → Create repository.
+    (Bezplatné GitHub Pages vyžaduje Public repozitár – dáta sú však zašifrované.)
+ 3. V repozitári kliknite „uploading an existing file“ → pretiahnite index.html, admin.html, data.json → Commit changes.
+ 4. Settings → Pages → Source: „Deploy from a branch“, Branch: main, priečinok / (root) → Save.
+ 5. O 1–2 minúty je web na adrese: https://<vase-meno>.github.io/tu-kampane/
+    Túto adresu pošlite dealerom spolu s ich ID a PIN.
+
+
+2) TÝŽDENNÁ AKTUALIZÁCIA (cca 2 minúty)
+---------------------------------------
+ 1. Otvorte https://<vase-meno>.github.io/tu-kampane/admin.html (alebo admin.html lokálne v počítači).
+ 2. Vyberte súbor ID_a_PIN_pre_TUweb.xlsx a nový týždenný Excel so zoznamom VIN.
+ 3. Kliknite „Vytvoriť data.json“ – súbor sa stiahne.
+ 4. Na GitHube v repozitári: Add file → Upload files → pretiahnite nový data.json → Commit changes.
+ Hotovo. Dealeri uvidia nový zoznam po opätovnom prihlásení.
+
+ Zmena PINu / nový dealer: upravte ID_a_PIN_pre_TUweb.xlsx (stĺpec C) a urobte krok 2 znova.
+ Starý PIN prestane platiť hneď po nahratí nového data.json.
+
+
+3) AKO TO FUNGUJE
+-----------------
+ - Dáta sú zašifrované (AES-256). Kľúč sa odvodí z ID + PIN, takže bez PINu nikto zoznam neuvidí,
+   ani keď si stiahne data.json.
+ - Každý dealer vidí všetky VIN (auto môže prísť do servisu k hocikomu).
+ - Vyhľadáva sa podľa ľubovoľnej časti VIN (min. 3 znaky), napr. posledných 5–6 znakov.
+ - Automatické odhlásenie po 30 minútach nečinnosti.
+ - Obmedzenie: 4-miestny PIN má len 10 000 kombinácií. Bežného návštevníka zastaví, ale technicky
+   zdatný človek so súborom data.json by ho vedel uhádnuť (rádovo minúty až hodiny). Pre vyššiu bezpečnosť
+   stačí dať dlhšie PINy (6–8 číslic) – web ich podporuje bez úprav.

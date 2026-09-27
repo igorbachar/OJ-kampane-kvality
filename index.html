@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Kontrola kampaní TU</title>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--ink:#1a1d21;--muted:#5f6873;--line:#dfe3e8;--accent:#1f5fae;--accent-ink:#fff;
+  --open:#b45309;--open-bg:#fff4e5;--done:#1d7a46;--done-bg:#e8f5ee;--none:#3f6b8f;--none-bg:#eaf1f7;--err:#b3261e;--mark:#ffe58a}
+@media (prefers-color-scheme:dark){:root{--bg:#121417;--card:#1c1f24;--ink:#e7e9ec;--muted:#98a1ab;--line:#30363d;--accent:#6ea8ff;--accent-ink:#0b1a2e;
+  --open:#ffb366;--open-bg:#3a2a16;--done:#6fd39b;--done-bg:#15301f;--none:#8fbbe0;--none-bg:#172636;--err:#ff8a80;--mark:#6b5a12}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:24px 16px 48px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+h1{font-size:20px;margin:0}
+.sub{color:var(--muted);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+label{display:block;font-weight:600;font-size:13px;margin:0 0 6px}
+input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+input:focus{outline:2px solid var(--accent);outline-offset:1px}
+button{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:11px 18px;font:inherit;font-weight:600;cursor:pointer}
+button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);padding:7px 12px;font-weight:500}
+button:disabled{opacity:.55;cursor:default}
+#login{max-width:380px;margin:8vh auto 0}
+#login .row{margin-bottom:14px}
+.err{color:var(--err);font-size:14px;min-height:21px;margin-top:10px}
+.search{position:relative;margin-bottom:8px}
+.search input{font-size:18px;padding:14px 14px;letter-spacing:.04em;text-transform:uppercase;font-family:ui-monospace,Consolas,monospace}
+.meta{color:var(--muted);font-size:13px;margin:0 0 18px}
+.res{display:grid;gap:12px}
+.veh{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.veh-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.vin{font:600 17px/1.3 ui-monospace,Consolas,monospace;letter-spacing:.03em;word-break:break-all}
+mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
+.vsub{color:var(--muted);font-size:13px;margin-top:2px}
+.badge{display:inline-block;align-self:start;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600;white-space:nowrap}
+.b-open{background:var(--open-bg);color:var(--open)}
+.b-done{background:var(--done-bg);color:var(--done)}
+.b-none{background:var(--none-bg);color:var(--none)}
+.camps{margin-top:12px;border-top:1px solid var(--line)}
+.camp{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.camp:last-child{border-bottom:0;padding-bottom:0}
+.cname{font-weight:600}
+.cmeta{color:var(--muted);font-size:13px}
+.empty{color:var(--muted);text-align:center;padding:28px 12px}
+.hidden{display:none!important}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:r .7s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes r{to{transform:rotate(360deg)}}
+@media (max-width:520px){.camp{grid-template-columns:1fr}.camp .badge{justify-self:start}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- PRIHLÁSENIE -->
+  <form id="login" class="card" autocomplete="on">
+    <h1 style="margin-bottom:4px">Kontrola kampaní kvality</h1>
+    <p class="sub" style="margin:0 0 20px">Prihláste sa kódom dealera a PIN.</p>
+    <div class="row">
+      <label for="uid">Kód dealera (ID)</label>
+      <input id="uid" name="username" autocomplete="username" placeholder="napr. OSK0010" required>
+    </div>
+    <div class="row">
+      <label for="pin">PIN</label>
+      <input id="pin" name="password" type="password" inputmode="numeric" autocomplete="current-password" required>
+    </div>
+    <button id="btnLogin" type="submit" style="width:100%">Prihlásiť</button>
+    <div class="err" id="loginErr"></div>
+  </form>
+
+  <!-- APLIKÁCIA -->
+  <section id="app" class="hidden">
+    <header>
+      <div>
+        <h1>Kontrola kampaní kvality (TU)</h1>
+        <div class="sub" id="who"></div>
+      </div>
+      <button class="ghost" id="logout" type="button">Odhlásiť</button>
+    </header>
+    <div class="search">
+      <input id="q" placeholder="Zadajte VIN alebo jeho časť (napr. posledných 6 znakov)" autocomplete="off" spellcheck="false" maxlength="17">
+    </div>
+    <p class="meta" id="meta"></p>
+    <div class="res" id="res"></div>
+  </section>
+
+</div>
+<script>
+(() => {
+const DATA_URL = 'data.json';
+const IDLE_MIN = 30;
+const enc = new TextEncoder(), dec = new TextDecoder();
+const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtD = iso => { if(!iso) return ''; const [y,m,d] = iso.slice(0,10).split('-'); return `${+d}. ${+m}. ${y}`; };
+const ss = { get(k){ try{return sessionStorage.getItem(k)}catch(e){return null} }, set(k,v){ try{sessionStorage.setItem(k,v)}catch(e){} }, del(k){ try{sessionStorage.removeItem(k)}catch(e){} } };
+
+let file = null, db = null, vins = null, who = null;
+
+async function sha256hex(s){ const h = await crypto.subtle.digest('SHA-256', enc.encode(s)); return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
+async function loadFile(){
+  if (file) return file;
+  const r = await fetch(DATA_URL + '?t=' + Date.now(), {cache:'no-store'});
+  if (!r.ok) throw new Error('Nepodarilo sa načítať dáta (' + r.status + ').');
+  return file = await r.json();
+}
+async function decryptData(rawKeyB64){
+  const key = await crypto.subtle.importKey('raw', ub64(rawKeyB64), 'AES-GCM', false, ['decrypt']);
+  const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv: ub64(file.iv)}, key, ub64(file.data));
+  return JSON.parse(dec.decode(pt));
+}
+async function login(id, pin){
+  await loadFile();
+  const entry = file.keys[await sha256hex('tu-web:' + id)];
+  if (!entry) throw new Error('bad');
+  const base = await crypto.subtle.importKey('raw', enc.encode(id + ':' + pin), 'PBKDF2', false, ['deriveKey']);
+  const k = await crypto.subtle.deriveKey({name:'PBKDF2', salt: ub64(entry.s), iterations: file.iter, hash:'SHA-256'}, base, {name:'AES-GCM', length:256}, false, ['decrypt']);
+  let inner;
+  try { inner = JSON.parse(dec.decode(await crypto.subtle.decrypt({name:'AES-GCM', iv: ub64(entry.i)}, k, ub64(entry.w)))); }
+  catch(e){ throw new Error('bad'); }
+  return inner;
+}
+function index(){
+  const m = new Map();
+  for (const r of db.rows){
+    let v = m.get(r[0]);
+    if (!v) m.set(r[0], v = {vin:r[0], dealer:r[1], status:r[4], statusDate:r[5], camps:[]});
+    if (r[2]) v.camps.push({code:r[2], stav:r[3]});
+    if (r[1] && !v.dealer) v.dealer = r[1];
+  }
+  vins = [...m.values()];
+}
+function start(inner, id){
+  who = {id, name: inner.n};
+  $('login').classList.add('hidden'); $('app').classList.remove('hidden');
+  $('who').textContent = `${inner.n} (${id})`;
+  const vinCount = vins.length;
+  $('meta').textContent = `Zoznam aktualizovaný ${fmtD(file.updated)} · ${vinCount.toLocaleString('sk-SK')} VIN v databáze. Zadajte aspoň 3 znaky.`;
+  $('q').value = ''; $('res').innerHTML = ''; $('q').focus();
+  resetIdle();
+}
+function logout(msg){
+  db = null; vins = null; who = null; file = null; ss.del('tuk'); ss.del('tuid');
+  $('app').classList.add('hidden'); $('login').classList.remove('hidden');
+  $('pin').value = ''; $('loginErr').textContent = msg || ''; $('res').innerHTML = '';
+}
+let idleT; function resetIdle(){ clearTimeout(idleT); idleT = setTimeout(() => logout('Boli ste odhlásený pre nečinnosť.'), IDLE_MIN*60000); }
+['keydown','click','touchstart'].forEach(e => document.addEventListener(e, () => { if (who) resetIdle(); }, {passive:true}));
+
+$('login').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const id = $('uid').value.trim().toUpperCase(), pin = $('pin').value.trim();
+  const btn = $('btnLogin'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span>Overujem…'; $('loginErr').textContent = '';
+  try {
+    const inner = await login(id, pin);
+    db = await decryptData(inner.k); index();
+    ss.set('tuk', JSON.stringify(inner)); ss.set('tuid', id);
+    start(inner, id);
+  } catch(e) {
+    $('loginErr').textContent = e.message === 'bad' ? 'Nesprávny kód dealera alebo PIN.' : e.message;
+    file = null;
+  }
+  btn.disabled = false; btn.textContent = 'Prihlásiť';
+});
+$('logout').onclick = () => logout();
+
+function hl(vin, q){
+  const i = vin.indexOf(q); if (i < 0) return esc(vin);
+  return esc(vin.slice(0,i)) + '<mark>' + esc(vin.slice(i, i+q.length)) + '</mark>' + esc(vin.slice(i+q.length));
+}
+function render(){
+  const q = $('q').value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const res = $('res');
+  if (q.length < 3){ res.innerHTML = ''; return; }
+  const hits = vins.filter(v => v.vin.includes(q));
+  if (!hits.length){ res.innerHTML = `<div class="card empty">VIN obsahujúce „${esc(q)}“ sa v zozname nenachádza.<br>Vozidlo nemá evidovanú kampaň kvality alebo nie je v zozname – v prípade pochybností kontaktujte importéra.</div>`; return; }
+  const MAX = 50;
+  hits.sort((a,b) => (b.vin.endsWith(q) - a.vin.endsWith(q)) || a.vin.localeCompare(b.vin));
+  let html = hits.length > MAX ? `<p class="meta" style="margin:0">Nájdených ${hits.length} VIN, zobrazujem prvých ${MAX}. Zadajte viac znakov.</p>` : (hits.length > 1 ? `<p class="meta" style="margin:0">Nájdených ${hits.length} VIN.</p>` : '');
+  for (const v of hits.slice(0, MAX)){
+    const open = v.camps.filter(c => c.stav === 0).length;
+    const camps = v.camps.slice().sort((a,b) => (a.stav - b.stav) || a.code.localeCompare(b.code));
+    const first = camps.length ? db.camps[camps[0].code] : null;
+    const model = camps.map(c => db.camps[c.code]?.[2]).find(Boolean) || '';
+    let badge;
+    if (!v.camps.length) badge = '<span class="badge b-none">Bez kampane</span>';
+    else if (open) badge = `<span class="badge b-open">Otvorené kampane: ${open}</span>`;
+    else badge = '<span class="badge b-done">Všetky kampane vykonané</span>';
+    const dealerName = db.dealers[v.dealer] || v.dealer || '';
+    html += `<article class="veh"><div class="veh-top"><div><div class="vin">${hl(v.vin, q)}</div>
+      <div class="vsub">${[model, dealerName && ('Dealer: ' + dealerName)].filter(Boolean).map(esc).join(' · ')}</div></div>${badge}</div>`;
+    if (camps.length){
+      html += '<div class="camps">';
+      for (const c of camps){
+        const d = db.camps[c.code] || [];
+        html += `<div class="camp"><div><div class="cname">${esc(d[0] || c.code)}</div>
+          <div class="cmeta">${[c.code, d[1] && ('typ: ' + d[1]), d[4] && ('vydané ' + fmtD(d[4]))].filter(Boolean).map(esc).join(' · ')}</div></div>
+          ${c.stav === 1 ? '<span class="badge b-done">Vykonané</span>' : '<span class="badge b-open">Potrebné vykonať</span>'}</div>`;
+      }
+      html += '</div>';
+    } else {
+      html += '<div class="vsub" style="margin-top:8px">Na toto vozidlo nie je evidovaná žiadna kampaň kvality.</div>';
+    }
+    html += '</article>';
+  }
+  res.innerHTML = html;
+}
+$('q').addEventListener('input', render);
+
+// obnovenie po reloade stránky (len v rámci otvorenej karty)
+(async () => {
+  const saved = ss.get('tuk'), id = ss.get('tuid');
+  if (!saved || !id) return;
+  try { await loadFile(); const inner = JSON.parse(saved); db = await decryptData(inner.k); index(); start(inner, id); }
+  catch(e){ logout(); }
+})();
+})();
+</script>
+</body>
+</html>

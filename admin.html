@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aktualizácia dát TU</title>
+<meta name="robots" content="noindex,nofollow">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--ink:#1b1f24;--muted:#5d6670;--line:#dde1e6;--accent:#1f5fae;--ok:#1d7a46;--err:#b3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#14171b;--card:#1d2127;--ink:#e8eaed;--muted:#9aa3ad;--line:#333a42;--accent:#6ea8ff;--ok:#5cc88a;--err:#ff8a80}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:32px 16px}
+h1{font-size:22px;margin:0 0 4px}
+p.lead{color:var(--muted);margin:0 0 24px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px}
+label{display:block;font-weight:600;margin-bottom:6px}
+.hint{color:var(--muted);font-size:13px;margin-top:4px}
+input[type=file]{width:100%}
+button{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:11px 18px;font:inherit;font-weight:600;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}
+#log{white-space:pre-wrap;font:13px/1.5 ui-monospace,Consolas,monospace;color:var(--muted)}
+.ok{color:var(--ok)} .err{color:var(--err)}
+ol{padding-left:20px;margin:8px 0 0}
+</style>
+</head>
+<body>
+<main>
+  <h1>Aktualizácia dát kampaní (TU)</h1>
+  <p class="lead">Táto stránka beží len vo vašom prehliadači – nič sa nikam neodosiela. Vytvorí zašifrovaný súbor <b>data.json</b>, ktorý nahráte na web.</p>
+
+  <div class="card">
+    <label for="fDealers">1. Zoznam dealerov s PIN (ID_a_PIN_pre_TUweb.xlsx)</label>
+    <input type="file" id="fDealers" accept=".xlsx,.xls">
+    <div class="hint">Stĺpce: A = Kód dealera (ID), B = Skrátený názov, C = PIN. Tento súbor nikdy nenahrávajte na web.</div>
+  </div>
+
+  <div class="card">
+    <label for="fVin">2. Týždenný zoznam VIN (Napravne_servisne_akcie_TU___Zoznam_VIN_SK_….xlsx)</label>
+    <input type="file" id="fVin" accept=".xlsx,.xls">
+    <div class="hint">Prvý hárok, rovnaká štruktúra stĺpcov ako doteraz.</div>
+  </div>
+
+  <div class="card">
+    <button id="go" disabled>Vytvoriť data.json</button>
+    <div id="log" style="margin-top:14px"></div>
+  </div>
+
+  <div class="card">
+    <b>Potom:</b>
+    <ol>
+      <li>Otvorte svoj repozitár na GitHube → <i>Add file → Upload files</i>.</li>
+      <li>Pretiahnite stiahnutý <b>data.json</b> (prepíše starý) → <i>Commit changes</i>.</li>
+      <li>Po cca 1 minúte je nový zoznam na webe.</li>
+    </ol>
+  </div>
+</main>
+
+<script>
+const ITER = 300000;           // PBKDF2 iterácie – spomaľujú hádanie PIN
+const enc = new TextEncoder();
+const b64 = u8 => { let s=''; for (let i=0;i<u8.length;i+=0x8000) s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000)); return btoa(s); };
+const rnd = n => crypto.getRandomValues(new Uint8Array(n));
+const logEl = document.getElementById('log');
+const log = (m, cls) => { const d=document.createElement('div'); if(cls) d.className=cls; d.textContent=m; logEl.appendChild(d); };
+
+async function sha256hex(s){ const h=await crypto.subtle.digest('SHA-256',enc.encode(s)); return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
+async function deriveKey(id, pin, salt){
+  const base = await crypto.subtle.importKey('raw', enc.encode(id.toUpperCase()+':'+pin), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:ITER, hash:'SHA-256'}, base, {name:'AES-GCM', length:256}, false, ['encrypt','decrypt']);
+}
+function readSheet(file){
+  return file.arrayBuffer().then(buf => {
+    const wb = XLSX.read(buf, {type:'array', cellDates:true});
+    return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1, raw:true, defval:null});
+  });
+}
+const s = v => v==null ? '' : String(v).trim();
+const fmtDate = v => {
+  if (!(v instanceof Date) || isNaN(v)) return '';
+  const d = new Date(v.getTime() + 60e3);   // ochrana pred zaokrúhlením typu 23:59:59
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
+
+const fD = document.getElementById('fDealers'), fV = document.getElementById('fVin'), go = document.getElementById('go');
+const upd = () => go.disabled = !(fD.files[0] && fV.files[0]);
+fD.onchange = fV.onchange = upd;
+
+go.onclick = async () => {
+  logEl.innerHTML=''; go.disabled = true;
+  try {
+    // --- dealeri ---
+    const dRows = (await readSheet(fD.files[0])).slice(1).filter(r => s(r[0]));
+    const dealers = dRows.map(r => ({id:s(r[0]).toUpperCase(), name:s(r[1]), pin:s(r[2])}));
+    const bad = dealers.filter(d => !/^\d{4,}$/.test(d.pin));
+    if (bad.length) throw new Error('Chýba alebo je chybný PIN pre: ' + bad.map(d=>d.id).join(', '));
+    log(`Dealeri: ${dealers.length}`);
+
+    // --- VIN zoznam ---
+    const vRows = await readSheet(fV.files[0]);
+    // stĺpce hľadáme podľa názvu v hlavičke (poradie stĺpcov môže byť ľubovoľné)
+    const norm = x => s(x).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ');
+    const head = (vRows[0] || []).map(norm);
+    const col = (label, need = true) => {
+      const i = head.findIndex(h => h.startsWith(norm(label)));
+      if (i < 0 && need) throw new Error(`V hlavičke chýba stĺpec „${label}“.`);
+      return i;
+    };
+    const C = {
+      dealer: col('Kód dealera'), dname: col('Názov dealera', false), vin: col('VIN'),
+      tu: col('Kód TU'), typ: col('Typ TU', false), mkod: col('Kód modelu', false), model: col('Model', false),
+      nazov: col('Názov TU'), stav: col('Stav vykonania'), status: col('Status vozidla', false),
+      sdate: col('Dátum statusu', false), vydane: col('Dátum vydania TU', false)
+    };
+    const g = (r, k) => C[k] >= 0 ? r[C[k]] : null;
+    const body = vRows.slice(1).filter(r => s(g(r,'vin')));
+
+    const camps = {}, dealerNames = {}, rows = [];
+    for (const r of body) {
+      const vin = s(g(r,'vin')).toUpperCase().replace(/\s+/g,'');
+      const dcode = s(g(r,'dealer')), dname = s(g(r,'dname'));
+      if (dcode && dname && dname !== '#N/A') dealerNames[dcode] = dname;
+      let tu = s(g(r,'tu'));
+      if (!/^TB\d/i.test(tu)) tu = '';               // "nemá kampaň"
+      if (tu && (!camps[tu] || !camps[tu][4])) {
+        const m = tu.match(/^TB(\d{4})(\d{2})(\d{2})/i);
+        const issued = fmtDate(g(r,'vydane')) || (m ? `${m[1]}-${m[2]}-${m[3]}` : '');
+        camps[tu] = [s(g(r,'nazov')), s(g(r,'typ')), s(g(r,'model')), s(g(r,'mkod')), issued];
+      }
+      const sv = String(g(r,'stav') ?? '').trim();
+      const stav = tu ? (sv === '1' ? 1 : 0) : null;
+      rows.push([vin, dcode, tu, stav, s(g(r,'status')), fmtDate(g(r,'sdate'))]);
+    }
+    const payload = {
+      generated: new Date().toISOString(),
+      source: fV.files[0].name,
+      camps,               // kód TU -> [názov, typ, model, kód modelu, dátum vydania]
+      dealers: dealerNames,
+      rows                 // [VIN, dealer, kód TU, stav 0/1/null, status vozidla, dátum statusu]
+    };
+    const vinCount = new Set(rows.map(r=>r[0])).size;
+    log(`Riadky: ${rows.length} · unikátne VIN: ${vinCount} · kampane: ${Object.keys(camps).length}`);
+
+    // --- šifrovanie: dáta jedným náhodným kľúčom, ten kľúč zabalený pre každého dealera ---
+    const dataKeyRaw = rnd(32);
+    const dataKey = await crypto.subtle.importKey('raw', dataKeyRaw, 'AES-GCM', false, ['encrypt']);
+    const iv = rnd(12);
+    const ct = new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM', iv}, dataKey, enc.encode(JSON.stringify(payload))));
+    const keys = {};
+    for (const d of dealers) {
+      log(`Šifrujem prístup: ${d.id}`);
+      const salt = rnd(16), kiv = rnd(12);
+      const k = await deriveKey(d.id, d.pin, salt);
+      const wrapped = new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM', iv:kiv}, k,
+        enc.encode(JSON.stringify({k: b64(dataKeyRaw), n: d.name}))));
+      keys[await sha256hex('tu-web:' + d.id)] = {s: b64(salt), i: b64(kiv), w: b64(wrapped)};
+    }
+    const out = {v:1, iter:ITER, updated: payload.generated, iv: b64(iv), data: b64(ct), keys};
+    const blob = new Blob([JSON.stringify(out)], {type:'application/json'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'data.json'; a.click();
+    log(`Hotovo – data.json stiahnutý (${(blob.size/1024).toFixed(0)} kB). Nahrajte ho na GitHub.`, 'ok');
+    window.__lastOutput = out;
+  } catch (e) { log('Chyba: ' + e.message, 'err'); console.error(e); }
+  upd();
+};
+</script>
+</body>
+</html>
