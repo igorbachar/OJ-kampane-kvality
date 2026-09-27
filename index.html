@@ -93,7 +93,7 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 <script>
 (() => {
 const DATA_URL = 'data.json';
-const IDLE_MIN = 30;
+const IDLE_MIN = 480;   // 8 hodín
 const enc = new TextEncoder(), dec = new TextDecoder();
 const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const $ = id => document.getElementById(id);
