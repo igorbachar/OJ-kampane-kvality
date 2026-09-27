@@ -192,7 +192,8 @@ function render(){
     if (!v.camps.length) badge = '<span class="badge b-none">Bez kampane</span>';
     else if (open) badge = `<span class="badge b-open">Otvorené kampane: ${open}</span>`;
     else badge = '<span class="badge b-done">Všetky kampane vykonané</span>';
-    const dealerName = db.dealers[v.dealer] || v.dealer || '';
+    const dn = db.dealers[v.dealer];
+    const dealerName = v.dealer ? (dn && dn !== v.dealer ? `${v.dealer} – ${dn}` : v.dealer) : '';
     html += `<article class="veh"><div class="veh-top"><div><div class="vin">${hl(v.vin, q)}</div>
       <div class="vsub">${[model, dealerName && ('Dealer: ' + dealerName)].filter(Boolean).map(esc).join(' · ')}</div></div>${badge}</div>`;
     if (camps.length){
