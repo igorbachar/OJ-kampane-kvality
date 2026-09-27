@@ -43,6 +43,9 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 .camp{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
 .camp:last-child{border-bottom:0;padding-bottom:0}
 .cname{font-weight:600}
+.tbcode{display:inline-block;font:700 19px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--accent);
+  background:color-mix(in srgb,var(--accent) 12%,transparent);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);
+  border-radius:6px;padding:3px 9px;margin:0 0 6px}
 .cmeta{color:var(--muted);font-size:13px}
 .empty{color:var(--muted);text-align:center;padding:28px 12px}
 .hidden{display:none!important}
@@ -196,8 +199,8 @@ function render(){
       html += '<div class="camps">';
       for (const c of camps){
         const d = db.camps[c.code] || [];
-        html += `<div class="camp"><div><div class="cname">${esc(d[0] || c.code)}</div>
-          <div class="cmeta">${[c.code, d[1] && ('typ: ' + d[1]), d[4] && ('vydané ' + fmtD(d[4]))].filter(Boolean).map(esc).join(' · ')}</div></div>
+        html += `<div class="camp"><div><div class="tbcode">${esc(c.code)}</div><div class="cname">${esc(d[0] || c.code)}</div>
+          <div class="cmeta">${[d[1] && ('typ: ' + d[1]), d[4] && ('vydané ' + fmtD(d[4]))].filter(Boolean).map(esc).join(' · ')}</div></div>
           ${c.stav === 1 ? '<span class="badge b-done">Vykonané</span>' : '<span class="badge b-open">Potrebné vykonať</span>'}</div>`;
       }
       html += '</div>';
