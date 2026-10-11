@@ -113,8 +113,9 @@ go.onclick = async () => {
       nazov: col('Názov TU'), stav: col('Stav vykonania'), status: col('Status vozidla', false),
       sdate: col('Dátum statusu', false), vydane: col('Dátum vydania TU', false),
       pridane: col('Dátum pridania VIN', false), zaruka: col('Dátum začatia plynutia záruky', false),
-      motor: col('Číslo motora', false), pozn: col('Poznámka', false)
+      motor: col('Číslo motora', false), diglas: col('Číslo motora (DIGLAS)', false), pozn: col('Poznámka', false)
     };
+    if (C.motor === C.diglas) C.motor = head.findIndex(h => h === norm('Číslo motora'));
     const dateOrText = v => v instanceof Date ? fmtDate(v) : s(v);
     const g = (r, k) => C[k] >= 0 ? r[C[k]] : null;
     const body = vRows.slice(1).filter(r => s(g(r,'vin')));
@@ -135,11 +136,12 @@ go.onclick = async () => {
       const sv = String(g(r,'stav') ?? '').trim();
       const stav = tu ? (sv === '1' ? 1 : 0) : null;
       rows.push([vin, dcode, tu, stav, s(g(r,'status')), fmtDate(g(r,'sdate')), fmtDate(g(r,'pridane'))]);
-      const zar = dateOrText(g(r,'zaruka')), mot = s(g(r,'motor'));
-      if (zar || mot) {
-        const v = veh[vin] || (veh[vin] = ['', '']);
+      const zar = dateOrText(g(r,'zaruka')), mot = s(g(r,'motor')), dig = s(g(r,'diglas'));
+      if (zar || mot || dig) {
+        const v = veh[vin] || (veh[vin] = ['', '', '']);
         if (!v[0] || (zar && /^\d{4}-/.test(zar))) v[0] = zar || v[0];
         if (!v[1] || (mot && !/^nen/i.test(mot))) v[1] = mot || v[1];
+        if (!v[2] && dig) v[2] = dig;
       }
     }
     const payload = {
@@ -148,7 +150,7 @@ go.onclick = async () => {
       camps,               // kód TU -> [názov, typ, model, kód modelu, dátum vydania]
       dealers: dealerNames,
       rows,                // [VIN, dealer, kód TU, stav 0/1/null, status vozidla, dátum statusu, dátum pridania VIN]
-      veh                  // VIN -> [začiatok záruky (dátum alebo text), číslo motora]
+      veh                  // VIN -> [začiatok záruky (dátum alebo text), číslo motora, číslo motora DIGLAS]
     };
     const vinCount = new Set(rows.map(r=>r[0])).size;
     log(`Riadky: ${rows.length} · unikátne VIN: ${vinCount} · kampane: ${Object.keys(camps).length}`);

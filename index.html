@@ -49,11 +49,33 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 .camp.ended .tbcode,.camp.ended .cname{text-decoration:line-through;text-decoration-thickness:2px;opacity:.6}
 .camp.ended .tbcode{text-decoration-color:var(--err)}
 .b-ended{background:var(--err-bg);color:var(--err)}
+.hbtns{display:flex;gap:8px;align-items:center}
+.newsbtn{position:relative;background:var(--accent);color:var(--accent-ink);padding:8px 14px;font-weight:700}
+.newsbtn .dot{position:absolute;top:-4px;right:-4px;width:12px;height:12px;border-radius:50%;background:var(--err);border:2px solid var(--bg)}
+.back{display:inline-flex;align-items:center;gap:8px;margin-bottom:16px;background:var(--accent);color:var(--accent-ink);border:0;
+  font-weight:800;font-size:17px;padding:13px 22px;border-radius:10px;box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 35%,transparent)}
+.back:hover{filter:brightness(1.08)}
+@media (max-width:520px){.back{width:100%;justify-content:center}}
+.news-title{font-size:24px;margin:0 0 16px}
+.news-entry{display:grid;gap:10px;margin-bottom:24px}
+.news-date{font-weight:700;color:var(--muted);font-size:14px;letter-spacing:.03em;border-bottom:1px solid var(--line);padding-bottom:6px}
+.news-new,.news-warn{border-radius:12px;padding:14px 16px;border:2px solid}
+.news-new{background:var(--none-bg);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+.news-warn{background:var(--err-bg);border-color:var(--err);color:var(--err)}
+.news-h{font-weight:800;font-size:16px;margin-bottom:6px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.news-tag{font-size:11px;letter-spacing:.08em;padding:3px 8px;border-radius:999px;background:var(--accent);color:var(--accent-ink)}
+.news-tag.warn{background:var(--err);color:#fff}
+.news-entry ul{margin:4px 0 0;padding-left:20px}.news-entry li{margin:3px 0}
+.news-entry p{margin:0;font-size:15px}
+.news-tb{font:800 18px/1 ui-monospace,Consolas,monospace;text-decoration:line-through;text-decoration-thickness:2px}
+.c-motor{color:var(--motor)}.c-zar{color:var(--zar)}
 .vfacts{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
 .fact{display:flex;flex-direction:column;gap:2px;border-radius:8px;padding:7px 12px;border:1px solid}
 .fl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;opacity:.85}
 .f-motor{color:var(--motor);background:var(--motor-bg);border-color:var(--motor-line);border-width:2px}
 .f-motor .fv{font:800 20px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.04em;word-break:break-all}
+.f-diglas{color:var(--motor);background:transparent;border-color:var(--motor-line);border-style:dashed;border-width:2px}
+.f-diglas .fv{font:800 20px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.04em;word-break:break-all}
 .f-zar{color:var(--zar);background:var(--zar-bg);border-color:var(--zar-line)}
 .f-zar .fv{font-weight:700;font-size:16px}
 .tbcode{display:inline-block;font:800 28px/1.15 ui-monospace,Consolas,monospace;letter-spacing:.05em;color:var(--accent);
@@ -94,13 +116,40 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
         <h1>Kontrola kampaní kvality (TU)</h1>
         <div class="sub" id="who"></div>
       </div>
-      <button class="ghost" id="logout" type="button">Odhlásiť</button>
+      <div class="hbtns">
+        <button class="newsbtn" id="btnNews" type="button">Čo je nové?<span class="dot" aria-hidden="true"></span></button>
+        <button class="ghost" id="logout" type="button">Odhlásiť</button>
+      </div>
     </header>
+    <div id="searchView">
     <div class="search">
       <input id="q" placeholder="Zadajte VIN alebo jeho časť (napr. posledných 6 znakov)" autocomplete="off" spellcheck="false" maxlength="17">
     </div>
     <p class="meta" id="meta"></p>
     <div class="res" id="res"></div>
+    </div>
+
+    <!-- ČO JE NOVÉ -->
+    <div id="newsView" class="hidden">
+      <button class="back" id="btnBack" type="button">← Späť na vyhľadávanie VIN</button>
+      <h2 class="news-title">Čo je nové?</h2>
+
+      <article class="news-entry">
+        <div class="news-date">9. 10. 2026</div>
+        <div class="news-new">
+          <div class="news-h"><span class="news-tag">NOVINKA</span> Pri každom VIN teraz nájdete aj:</div>
+          <ul>
+            <li><b class="c-motor">Číslo motora</b> a <b class="c-motor">číslo motora zaznamenané v systéme DIGLAS</b></li>
+            <li><b class="c-zar">Dátum začatia plynutia záruky</b></li>
+            <li><b>Dátum pridania VIN</b> do zoznamu kampane</li>
+          </ul>
+        </div>
+        <div class="news-warn">
+          <div class="news-h"><span class="news-tag warn">DÔLEŽITÉ</span> Kampaň <span class="news-tb">TB20260316001</span> je <u>UKONČENÁ</u></div>
+          <p>Aktualizácia softvéru HCU – Obmedzenie zrýchlenia. <b>Nevykonávajte ju a neuplatňujte ju do systému.</b> Nebude preplatená.</p>
+        </div>
+      </article>
+    </div>
   </section>
 
 </div>
@@ -184,6 +233,9 @@ $('login').addEventListener('submit', async ev => {
   btn.disabled = false; btn.textContent = 'Prihlásiť';
 });
 $('logout').onclick = () => logout();
+function showNews(on){ $('newsView').classList.toggle('hidden', !on); $('searchView').classList.toggle('hidden', on); window.scrollTo(0,0); if(!on) $('q').focus(); }
+$('btnNews').onclick = () => showNews(true);
+$('btnBack').onclick = () => showNews(false);
 
 function hl(vin, q){
   const i = vin.indexOf(q); if (i < 0) return esc(vin);
@@ -213,11 +265,12 @@ function render(){
     const dealerName = v.dealer ? (dn && dn !== v.dealer ? `${v.dealer} – ${dn}` : v.dealer) : '';
     html += `<article class="veh"><div class="veh-top"><div><div class="vin">${hl(v.vin, q)}</div>
       <div class="vsub">${[model, dealerName && ('Dealer: ' + dealerName)].filter(Boolean).map(esc).join(' · ')}</div></div>${badge}</div>`;
-    const vx = (db.veh && db.veh[v.vin]) || ['', ''];
-    if (vx[0] || vx[1]) {
+    const vx = (db.veh && db.veh[v.vin]) || ['', '', ''];
+    if (vx[0] || vx[1] || vx[2]) {
       const zar = /^\d{4}-\d{2}-\d{2}$/.test(vx[0]) ? fmtD(vx[0]) : vx[0];
       html += '<div class="vfacts">';
       if (vx[1]) html += `<div class="fact f-motor"><span class="fl">Číslo motora</span><span class="fv">${esc(vx[1])}</span></div>`;
+      html += `<div class="fact f-diglas"><span class="fl">Číslo motora (DIGLAS)</span><span class="fv">${esc(vx[2] || 'neuvedené')}</span></div>`;
       if (vx[0]) html += `<div class="fact f-zar"><span class="fl">Začiatok plynutia záruky</span><span class="fv">${esc(zar)}</span></div>`;
       html += '</div>';
     }
