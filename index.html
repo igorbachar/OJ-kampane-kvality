@@ -7,9 +7,11 @@
 <title>Kontrola kampaní TU</title>
 <style>
 :root{--bg:#f4f5f7;--card:#fff;--ink:#1a1d21;--muted:#5f6873;--line:#dfe3e8;--accent:#1f5fae;--accent-ink:#fff;
-  --open:#b45309;--open-bg:#fff4e5;--done:#1d7a46;--done-bg:#e8f5ee;--none:#3f6b8f;--none-bg:#eaf1f7;--err:#b3261e;--mark:#ffe58a}
+  --open:#b45309;--open-bg:#fff4e5;--done:#1d7a46;--done-bg:#e8f5ee;--none:#3f6b8f;--none-bg:#eaf1f7;--err:#b3261e;--mark:#ffe58a;
+  --motor:#6d28d9;--motor-bg:#f3edff;--motor-line:#a78bfa;--zar:#0f766e;--zar-bg:#e6f6f4;--zar-line:#7fcfc5}
 @media (prefers-color-scheme:dark){:root{--bg:#121417;--card:#1c1f24;--ink:#e7e9ec;--muted:#98a1ab;--line:#30363d;--accent:#6ea8ff;--accent-ink:#0b1a2e;
-  --open:#ffb366;--open-bg:#3a2a16;--done:#6fd39b;--done-bg:#15301f;--none:#8fbbe0;--none-bg:#172636;--err:#ff8a80;--mark:#6b5a12}}
+  --open:#ffb366;--open-bg:#3a2a16;--done:#6fd39b;--done-bg:#15301f;--none:#8fbbe0;--none-bg:#172636;--err:#ff8a80;--mark:#6b5a12;
+  --motor:#c4b5fd;--motor-bg:#2a1f45;--motor-line:#7c5cd6;--zar:#5eead4;--zar-bg:#12302d;--zar-line:#2c7a70}}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 .wrap{max-width:860px;margin:0 auto;padding:24px 16px 48px}
@@ -43,6 +45,13 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 .camp{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
 .camp:last-child{border-bottom:0;padding-bottom:0}
 .cname{font-weight:600}
+.vfacts{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.fact{display:flex;flex-direction:column;gap:2px;border-radius:8px;padding:7px 12px;border:1px solid}
+.fl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;opacity:.85}
+.f-motor{color:var(--motor);background:var(--motor-bg);border-color:var(--motor-line);border-width:2px}
+.f-motor .fv{font:800 20px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.04em;word-break:break-all}
+.f-zar{color:var(--zar);background:var(--zar-bg);border-color:var(--zar-line)}
+.f-zar .fv{font-weight:700;font-size:16px}
 .tbcode{display:inline-block;font:700 19px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.04em;color:var(--accent);
   background:color-mix(in srgb,var(--accent) 12%,transparent);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);
   border-radius:6px;padding:3px 9px;margin:0 0 6px}
@@ -130,8 +139,9 @@ function index(){
   const m = new Map();
   for (const r of db.rows){
     let v = m.get(r[0]);
-    if (!v) m.set(r[0], v = {vin:r[0], dealer:r[1], status:r[4], statusDate:r[5], camps:[]});
-    if (r[2]) v.camps.push({code:r[2], stav:r[3]});
+    if (!v) m.set(r[0], v = {vin:r[0], dealer:r[1], status:r[4], statusDate:r[5], camps:[], added:''});
+    if (r[2]) v.camps.push({code:r[2], stav:r[3], added:r[6] || ''});
+    else if (r[6]) v.added = r[6];
     if (r[1] && !v.dealer) v.dealer = r[1];
   }
   vins = [...m.values()];
@@ -196,17 +206,25 @@ function render(){
     const dealerName = v.dealer ? (dn && dn !== v.dealer ? `${v.dealer} – ${dn}` : v.dealer) : '';
     html += `<article class="veh"><div class="veh-top"><div><div class="vin">${hl(v.vin, q)}</div>
       <div class="vsub">${[model, dealerName && ('Dealer: ' + dealerName)].filter(Boolean).map(esc).join(' · ')}</div></div>${badge}</div>`;
+    const vx = (db.veh && db.veh[v.vin]) || ['', ''];
+    if (vx[0] || vx[1]) {
+      const zar = /^\d{4}-\d{2}-\d{2}$/.test(vx[0]) ? fmtD(vx[0]) : vx[0];
+      html += '<div class="vfacts">';
+      if (vx[1]) html += `<div class="fact f-motor"><span class="fl">Číslo motora</span><span class="fv">${esc(vx[1])}</span></div>`;
+      if (vx[0]) html += `<div class="fact f-zar"><span class="fl">Začiatok plynutia záruky</span><span class="fv">${esc(zar)}</span></div>`;
+      html += '</div>';
+    }
     if (camps.length){
       html += '<div class="camps">';
       for (const c of camps){
         const d = db.camps[c.code] || [];
         html += `<div class="camp"><div><div class="tbcode">${esc(c.code)}</div><div class="cname">${esc(d[0] || c.code)}</div>
-          <div class="cmeta">${[d[1] && ('typ: ' + d[1]), d[4] && ('vydané ' + fmtD(d[4]))].filter(Boolean).map(esc).join(' · ')}</div></div>
+          <div class="cmeta">${[d[1] && ('typ: ' + d[1]), d[4] && ('vydané ' + fmtD(d[4])), c.added && ('VIN pridané do zoznamu ' + fmtD(c.added))].filter(Boolean).map(esc).join(' · ')}</div></div>
           ${c.stav === 1 ? '<span class="badge b-done">Vykonané</span>' : '<span class="badge b-open">Potrebné vykonať</span>'}</div>`;
       }
       html += '</div>';
     } else {
-      html += '<div class="vsub" style="margin-top:8px">Na toto vozidlo nie je evidovaná žiadna kampaň kvality.</div>';
+      html += `<div class="vsub" style="margin-top:8px">Na toto vozidlo nie je evidovaná žiadna kampaň kvality.${v.added ? ' · VIN pridané do zoznamu ' + esc(fmtD(v.added)) : ''}</div>`;
     }
     html += '</article>';
   }

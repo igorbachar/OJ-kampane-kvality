@@ -111,12 +111,15 @@ go.onclick = async () => {
       dealer: col('Kód dealera'), dname: col('Názov dealera', false), vin: col('VIN'),
       tu: col('Kód TU'), typ: col('Typ TU', false), mkod: col('Kód modelu', false), model: col('Model', false),
       nazov: col('Názov TU'), stav: col('Stav vykonania'), status: col('Status vozidla', false),
-      sdate: col('Dátum statusu', false), vydane: col('Dátum vydania TU', false)
+      sdate: col('Dátum statusu', false), vydane: col('Dátum vydania TU', false),
+      pridane: col('Dátum pridania VIN', false), zaruka: col('Dátum začatia plynutia záruky', false),
+      motor: col('Číslo motora', false)
     };
+    const dateOrText = v => v instanceof Date ? fmtDate(v) : s(v);
     const g = (r, k) => C[k] >= 0 ? r[C[k]] : null;
     const body = vRows.slice(1).filter(r => s(g(r,'vin')));
 
-    const camps = {}, dealerNames = {}, rows = [];
+    const camps = {}, dealerNames = {}, rows = [], veh = {};
     for (const r of body) {
       const vin = s(g(r,'vin')).toUpperCase().replace(/\s+/g,'');
       const dcode = s(g(r,'dealer')), dname = s(g(r,'dname'));
@@ -130,14 +133,21 @@ go.onclick = async () => {
       }
       const sv = String(g(r,'stav') ?? '').trim();
       const stav = tu ? (sv === '1' ? 1 : 0) : null;
-      rows.push([vin, dcode, tu, stav, s(g(r,'status')), fmtDate(g(r,'sdate'))]);
+      rows.push([vin, dcode, tu, stav, s(g(r,'status')), fmtDate(g(r,'sdate')), fmtDate(g(r,'pridane'))]);
+      const zar = dateOrText(g(r,'zaruka')), mot = s(g(r,'motor'));
+      if (zar || mot) {
+        const v = veh[vin] || (veh[vin] = ['', '']);
+        if (!v[0] || (zar && /^\d{4}-/.test(zar))) v[0] = zar || v[0];
+        if (!v[1] || (mot && !/^nen/i.test(mot))) v[1] = mot || v[1];
+      }
     }
     const payload = {
       generated: new Date().toISOString(),
       source: fV.files[0].name,
       camps,               // kód TU -> [názov, typ, model, kód modelu, dátum vydania]
       dealers: dealerNames,
-      rows                 // [VIN, dealer, kód TU, stav 0/1/null, status vozidla, dátum statusu]
+      rows,                // [VIN, dealer, kód TU, stav 0/1/null, status vozidla, dátum statusu, dátum pridania VIN]
+      veh                  // VIN -> [začiatok záruky (dátum alebo text), číslo motora]
     };
     const vinCount = new Set(rows.map(r=>r[0])).size;
     log(`Riadky: ${rows.length} · unikátne VIN: ${vinCount} · kampane: ${Object.keys(camps).length}`);
@@ -156,7 +166,8 @@ go.onclick = async () => {
         enc.encode(JSON.stringify({k: b64(dataKeyRaw), n: d.name}))));
       keys[await sha256hex('tu-web:' + d.id)] = {s: b64(salt), i: b64(kiv), w: b64(wrapped)};
     }
-    const out = {v:1, iter:ITER, updated: payload.generated, iv: b64(iv), data: b64(ct), keys};
+    const fd = fV.files[0].name.match(/(\d{4})-(\d{2})-(\d{2})/);   // dátum zoznamu z názvu súboru
+    const out = {v:1, iter:ITER, updated: fd ? `${fd[1]}-${fd[2]}-${fd[3]}` : payload.generated, iv: b64(iv), data: b64(ct), keys};
     const blob = new Blob([JSON.stringify(out)], {type:'application/json'});
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'data.json'; a.click();
     log(`Hotovo – data.json stiahnutý (${(blob.size/1024).toFixed(0)} kB). Nahrajte ho na GitHub.`, 'ok');
