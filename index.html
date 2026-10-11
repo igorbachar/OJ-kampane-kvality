@@ -8,10 +8,10 @@
 <style>
 :root{--bg:#f4f5f7;--card:#fff;--ink:#1a1d21;--muted:#5f6873;--line:#dfe3e8;--accent:#1f5fae;--accent-ink:#fff;
   --open:#b45309;--open-bg:#fff4e5;--done:#1d7a46;--done-bg:#e8f5ee;--none:#3f6b8f;--none-bg:#eaf1f7;--err:#b3261e;--mark:#ffe58a;
-  --motor:#6d28d9;--motor-bg:#f3edff;--motor-line:#a78bfa;--zar:#0f766e;--zar-bg:#e6f6f4;--zar-line:#7fcfc5}
+  --err-bg:#fdecea;--motor:#6d28d9;--motor-bg:#f3edff;--motor-line:#a78bfa;--zar:#0f766e;--zar-bg:#e6f6f4;--zar-line:#7fcfc5}
 @media (prefers-color-scheme:dark){:root{--bg:#121417;--card:#1c1f24;--ink:#e7e9ec;--muted:#98a1ab;--line:#30363d;--accent:#6ea8ff;--accent-ink:#0b1a2e;
   --open:#ffb366;--open-bg:#3a2a16;--done:#6fd39b;--done-bg:#15301f;--none:#8fbbe0;--none-bg:#172636;--err:#ff8a80;--mark:#6b5a12;
-  --motor:#c4b5fd;--motor-bg:#2a1f45;--motor-line:#7c5cd6;--zar:#5eead4;--zar-bg:#12302d;--zar-line:#2c7a70}}
+  --err-bg:#3b1715;--motor:#c4b5fd;--motor-bg:#2a1f45;--motor-line:#7c5cd6;--zar:#5eead4;--zar-bg:#12302d;--zar-line:#2c7a70}}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 .wrap{max-width:860px;margin:0 auto;padding:24px 16px 48px}
@@ -45,6 +45,10 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 .camp{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
 .camp:last-child{border-bottom:0;padding-bottom:0}
 .cname{font-weight:600}
+.cnote{margin-top:8px;padding:9px 12px;border-radius:8px;border:2px solid var(--err);background:var(--err-bg);color:var(--err);font-weight:700;font-size:15px;line-height:1.4}
+.camp.ended .tbcode,.camp.ended .cname{text-decoration:line-through;text-decoration-thickness:2px;opacity:.6}
+.camp.ended .tbcode{text-decoration-color:var(--err)}
+.b-ended{background:var(--err-bg);color:var(--err)}
 .vfacts{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
 .fact{display:flex;flex-direction:column;gap:2px;border-radius:8px;padding:7px 12px;border:1px solid}
 .fl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;opacity:.85}
@@ -195,13 +199,15 @@ function render(){
   hits.sort((a,b) => (b.vin.endsWith(q) - a.vin.endsWith(q)) || a.vin.localeCompare(b.vin));
   let html = hits.length > MAX ? `<p class="meta" style="margin:0">Nájdených ${hits.length} VIN, zobrazujem prvých ${MAX}. Zadajte viac znakov.</p>` : (hits.length > 1 ? `<p class="meta" style="margin:0">Nájdených ${hits.length} VIN.</p>` : '');
   for (const v of hits.slice(0, MAX)){
-    const open = v.camps.filter(c => c.stav === 0).length;
-    const camps = v.camps.slice().sort((a,b) => (a.stav - b.stav) || a.code.localeCompare(b.code));
-    const first = camps.length ? db.camps[camps[0].code] : null;
+    const isEnded = c => /ukon[cč]en/i.test((db.camps[c.code] || [])[5] || '');
+    const open = v.camps.filter(c => c.stav === 0 && !isEnded(c)).length;
+    const active = v.camps.filter(c => !isEnded(c)).length;
+    const camps = v.camps.slice().sort((a,b) => (isEnded(a) - isEnded(b)) || (a.stav - b.stav) || a.code.localeCompare(b.code));
     const model = camps.map(c => db.camps[c.code]?.[2]).find(Boolean) || '';
     let badge;
     if (!v.camps.length) badge = '<span class="badge b-none">Bez kampane</span>';
     else if (open) badge = `<span class="badge b-open">Otvorené kampane: ${open}</span>`;
+    else if (!active) badge = '<span class="badge b-none">Iba ukončené kampane</span>';
     else badge = '<span class="badge b-done">Všetky kampane vykonané</span>';
     const dn = db.dealers[v.dealer];
     const dealerName = v.dealer ? (dn && dn !== v.dealer ? `${v.dealer} – ${dn}` : v.dealer) : '';
@@ -219,9 +225,13 @@ function render(){
       html += '<div class="camps">';
       for (const c of camps){
         const d = db.camps[c.code] || [];
-        html += `<div class="camp"><div><div class="tbcode">${esc(c.code)}</div><div class="cname">${esc(d[0] || c.code)}</div>
-          <div class="cmeta">${[d[1] && ('typ: ' + d[1]), d[4] && ('vydané ' + fmtD(d[4])), c.added && ('VIN pridané do zoznamu ' + fmtD(c.added))].filter(Boolean).map(esc).join(' · ')}</div></div>
-          ${c.stav === 1 ? '<span class="badge b-done">Vykonané</span>' : '<span class="badge b-open">Potrebné vykonať</span>'}</div>`;
+        const ended = isEnded(c), note = d[5] || '';
+        const st = ended ? '<span class="badge b-ended">Ukončená – nevykonávať</span>'
+          : c.stav === 1 ? '<span class="badge b-done">Vykonané</span>' : '<span class="badge b-open">Potrebné vykonať</span>';
+        html += `<div class="camp${ended ? ' ended' : ''}"><div><div class="tbcode">${esc(c.code)}</div><div class="cname">${esc(d[0] || c.code)}</div>
+          <div class="cmeta">${[d[1] && ('typ: ' + d[1]), d[4] && ('vydané ' + fmtD(d[4])), c.added && ('VIN pridané do zoznamu ' + fmtD(c.added))].filter(Boolean).map(esc).join(' · ')}</div>
+          ${note ? `<div class="cnote">⚠ ${esc(note)}</div>` : ''}</div>
+          ${st}</div>`;
       }
       html += '</div>';
     } else {

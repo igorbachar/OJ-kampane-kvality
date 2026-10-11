@@ -113,7 +113,7 @@ go.onclick = async () => {
       nazov: col('Názov TU'), stav: col('Stav vykonania'), status: col('Status vozidla', false),
       sdate: col('Dátum statusu', false), vydane: col('Dátum vydania TU', false),
       pridane: col('Dátum pridania VIN', false), zaruka: col('Dátum začatia plynutia záruky', false),
-      motor: col('Číslo motora', false)
+      motor: col('Číslo motora', false), pozn: col('Poznámka', false)
     };
     const dateOrText = v => v instanceof Date ? fmtDate(v) : s(v);
     const g = (r, k) => C[k] >= 0 ? r[C[k]] : null;
@@ -129,8 +129,9 @@ go.onclick = async () => {
       if (tu && (!camps[tu] || !camps[tu][4])) {
         const m = tu.match(/^TB(\d{4})(\d{2})(\d{2})/i);
         const issued = fmtDate(g(r,'vydane')) || (m ? `${m[1]}-${m[2]}-${m[3]}` : '');
-        camps[tu] = [s(g(r,'nazov')), s(g(r,'typ')), s(g(r,'model')), s(g(r,'mkod')), issued];
+        camps[tu] = [s(g(r,'nazov')), s(g(r,'typ')), s(g(r,'model')), s(g(r,'mkod')), issued, (camps[tu] && camps[tu][5]) || ''];
       }
+      if (tu && !camps[tu][5] && s(g(r,'pozn'))) camps[tu][5] = s(g(r,'pozn'));   // poznámka ku kampani
       const sv = String(g(r,'stav') ?? '').trim();
       const stav = tu ? (sv === '1' ? 1 : 0) : null;
       rows.push([vin, dcode, tu, stav, s(g(r,'status')), fmtDate(g(r,'sdate')), fmtDate(g(r,'pridane'))]);
