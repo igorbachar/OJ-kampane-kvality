@@ -45,7 +45,9 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 .camp{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
 .camp:last-child{border-bottom:0;padding-bottom:0}
 .cname{font-weight:600}
-.cnote{margin-top:8px;padding:9px 12px;border-radius:8px;border:2px solid var(--err);background:var(--err-bg);color:var(--err);font-weight:700;font-size:15px;line-height:1.4}
+.cnote{margin-top:8px;padding:9px 12px;border-radius:8px;border:2px solid var(--err);background:var(--err-bg);color:var(--err);font-weight:400;font-size:15px;line-height:1.45}
+.cnote b{font-weight:800}
+.cnote .ntb{font:800 16px/1 ui-monospace,Consolas,monospace}
 .camp.ended .tbcode,.camp.ended .cname{text-decoration:line-through;text-decoration-thickness:2px;opacity:.6}
 .camp.ended .tbcode{text-decoration-color:var(--err)}
 .b-ended{background:var(--err-bg);color:var(--err)}
@@ -68,6 +70,7 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 .news-entry ul{margin:4px 0 0;padding-left:20px}.news-entry li{margin:3px 0}
 .news-entry p{margin:0;font-size:15px}
 .news-tb{font:800 18px/1 ui-monospace,Consolas,monospace}
+.news-entry p.news-repl{margin-top:8px;padding-top:8px;border-top:1px dashed var(--err)}
 .c-motor{color:var(--motor)}.c-zar{color:var(--zar)}
 .vfacts{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
 .fact{display:flex;flex-direction:column;gap:2px;border-radius:8px;padding:7px 12px;border:1px solid}
@@ -147,6 +150,7 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
         <div class="news-warn">
           <div class="news-h"><span class="news-tag warn">DÔLEŽITÉ</span> Kampaň <span class="news-tb">TB20260316001</span> je <u>UKONČENÁ</u></div>
           <p>Aktualizácia softvéru HCU – Obmedzenie zrýchlenia. <b>Nevykonávajte ju a neuplatňujte ju do systému.</b> Nebude preplatená.</p>
+          <p class="news-repl">Kampaň je nahradená kampaňou <span class="news-tb">TB20260807001</span> – Namŕzanie škrtiacej klapky.</p>
         </div>
       </article>
     </div>
@@ -237,6 +241,14 @@ function showNews(on){ $('newsView').classList.toggle('hidden', !on); $('searchV
 $('btnNews').onclick = () => showNews(true);
 $('btnBack').onclick = () => showNews(false);
 
+// poznámka: bežné písmo, tučne len úvod "Dôležité:", slová VEĽKÝMI písmenami a kódy kampaní
+function fmtNote(t){
+  let h = esc(t);
+  h = h.replace(/^([^:.]{1,30}:)/, '<b>$1</b>');
+  h = h.replace(/\b(TB\d{8,})\b/g, '<span class="ntb">$1</span>');
+  h = h.replace(/(^|[\s(])([A-ZÁÄČĎÉÍĹĽŇÓÔŔŠŤÚÝŽ]{4,})(?=[\s.,;:!)]|$)/g, '$1<b>$2</b>');
+  return h;
+}
 function hl(vin, q){
   const i = vin.indexOf(q); if (i < 0) return esc(vin);
   return esc(vin.slice(0,i)) + '<mark>' + esc(vin.slice(i, i+q.length)) + '</mark>' + esc(vin.slice(i+q.length));
@@ -283,7 +295,7 @@ function render(){
           : c.stav === 1 ? '<span class="badge b-done">Vykonané</span>' : '<span class="badge b-open">Potrebné vykonať</span>';
         html += `<div class="camp${ended ? ' ended' : ''}"><div><div class="tbcode">${esc(c.code)}</div><div class="cname">${esc(d[0] || c.code)}</div>
           <div class="cmeta">${[d[1] && ('typ: ' + d[1]), d[4] && ('vydané ' + fmtD(d[4])), c.added && ('VIN pridané do zoznamu ' + fmtD(c.added))].filter(Boolean).map(esc).join(' · ')}</div>
-          ${note ? `<div class="cnote">⚠ ${esc(note)}</div>` : ''}</div>
+          ${note ? `<div class="cnote">⚠ ${fmtNote(note)}</div>` : ''}</div>
           ${st}</div>`;
       }
       html += '</div>';
