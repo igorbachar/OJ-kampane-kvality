@@ -69,9 +69,90 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 .news-tag.warn{background:var(--err);color:#fff}
 .news-entry ul{margin:4px 0 0;padding-left:20px}.news-entry li{margin:3px 0}
 .news-entry p{margin:0;font-size:15px}
+.news-entry li .ctype{font-size:11px;padding:2px 7px;vertical-align:1px}
+.news-small{margin-top:8px!important;color:var(--muted)}
 .news-tb{font:800 18px/1 ui-monospace,Consolas,monospace}
 .news-entry p.news-repl{margin-top:8px;padding-top:8px;border-top:1px dashed var(--err)}
 .c-motor{color:var(--motor)}.c-zar{color:var(--zar)}
+/* typ kampane */
+.chead{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
+.chead .tbcode{margin-bottom:0}
+.camp .chead{margin-bottom:8px}
+.ctype{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:4px 9px;border-radius:999px;border:2px solid;white-space:nowrap}
+.ty-zvol{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.ty-akt{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 55%,transparent)}
+.ty-pas{background:transparent;color:var(--muted);border-color:var(--line)}
+.crow.ended .ctype,.camp.ended .ctype{opacity:.7}
+/* typy kampaní */
+.types{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:6px}
+@media (max-width:760px){.types{grid-template-columns:repeat(2,1fr)}}
+.tycard{display:flex;flex-direction:column;align-items:stretch;gap:4px;text-align:left;background:var(--card);color:var(--ink);border:2px solid var(--line);border-top-width:6px;border-radius:12px;padding:10px 12px;font-weight:400}
+.tycard:disabled{opacity:.45}
+.tycard.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--card));box-shadow:0 2px 10px color-mix(in srgb,var(--accent) 25%,transparent)}
+.tc-all{border-top-color:var(--accent)} .tc-zvol{border-top-color:var(--ink)} .tc-akt{border-top-color:color-mix(in srgb,var(--accent) 60%,transparent)} .tc-pas{border-top-color:var(--muted)}
+.tycard.on{border-top-color:var(--accent)}
+.tyl{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.tycard.on .tyl{color:var(--accent)}
+.tyv{font-size:24px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.tyv small{font-size:13px;font-weight:600;color:var(--muted)}
+.tycard .pbar{margin-top:4px}
+.tys{font-size:12px;color:var(--muted)}
+.st-typenote{margin:4px 0 10px;font-weight:700;color:var(--accent)}
+.st-tyh{font-weight:800;font-size:14px;margin:0 0 8px}.st-tyh span{font-weight:400;color:var(--muted)}
+/* export */
+.st-exp{margin-top:12px;border:2px solid color-mix(in srgb,var(--done) 45%,transparent);background:var(--done-bg)}
+.st-exp-h{font-weight:800;font-size:16px;margin-bottom:10px;color:var(--done)}
+.st-exp-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.st-exp-or{color:var(--muted);font-size:14px}
+.st-exp-row select{flex:1 1 220px;min-width:0;max-width:380px;width:auto}
+.exp-btn{background:var(--done);color:var(--card);font-weight:800}
+.exp-btn.alt{background:var(--card);color:var(--done);border:2px solid var(--done);padding:9px 16px}
+.st-exp-note{font-size:13px;color:var(--muted);margin-top:10px}
+.st-exp-msg{color:var(--err);font-weight:700;margin-left:6px}
+.xbtn{margin-top:6px;background:var(--card);color:var(--done);border:1px solid color-mix(in srgb,var(--done) 50%,transparent);padding:4px 10px;font-size:13px;font-weight:700}
+.xbtn:hover{background:var(--done-bg)}
+@media (max-width:620px){.st-exp-row select,.st-exp-row button{width:100%}}
+/* záložky */
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--line);margin:0 0 18px;overflow-x:auto}
+.tab{background:transparent;color:var(--muted);border-radius:8px 8px 0 0;padding:10px 16px;font-weight:700;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--card)}
+@media (max-width:520px){.tab{flex:1;padding:10px 6px;font-size:14px;white-space:normal}}
+/* prehľad */
+.st-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.st-title{font-size:22px;margin:0}
+.st-dealer{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--muted)}
+select{padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;max-width:100%}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:760px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.tl{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.tv{font-size:32px;font-weight:800;line-height:1.15;margin-top:4px;font-variant-numeric:tabular-nums}
+.ts{font-size:13px;color:var(--muted)}
+.t-open{border-left:5px solid var(--open)} .t-done{border-left:5px solid var(--done)}
+.pbar{height:10px;border-radius:5px;background:var(--open-bg);border:1px solid color-mix(in srgb,var(--open) 30%,transparent);overflow:hidden;margin-top:8px}
+.pbar span{display:block;height:100%;background:var(--done);border-radius:4px 0 0 4px}
+.st-h3{font-size:17px;margin:26px 0 10px}
+.st-camps{padding:4px 16px}
+.crow{display:grid;grid-template-columns:1fr auto;gap:6px 16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.crow:last-child{border-bottom:0}
+.crow:hover .ccode{text-decoration:underline}
+.ccode{font:800 20px/1.2 ui-monospace,Consolas,monospace;color:var(--accent);letter-spacing:.03em}
+.cnm{font-weight:600;font-size:14px;margin-top:2px}
+.cnum{text-align:right}
+.crow.ended{cursor:default;opacity:.7}.crow.ended .ccode,.crow.ended .cnm{text-decoration:line-through}
+.st-filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{background:var(--card);color:var(--muted);border-radius:0;padding:9px 14px;font-weight:600}
+.seg button.on{background:var(--accent);color:var(--accent-ink)}
+.st-list{display:grid;gap:6px}
+.lrow{display:grid;grid-template-columns:auto 1fr auto;gap:6px 14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+@media (max-width:620px){.lrow{grid-template-columns:1fr}}
+.lvin{background:none;color:var(--ink);padding:0;font:700 16px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.03em;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.lvin:hover{color:var(--accent)}
+.lmodel{color:var(--muted);font-size:13px}
+.lchips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:700 13px/1 ui-monospace,Consolas,monospace;padding:5px 8px;border-radius:6px}
+.ch-open{background:var(--open-bg);color:var(--open)} .ch-done{background:var(--done-bg);color:var(--done)}
 .vfacts{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
 .fact{display:flex;flex-direction:column;gap:2px;border-radius:8px;padding:7px 12px;border:1px solid}
 .fl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;opacity:.85}
@@ -124,6 +205,55 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
         <button class="ghost" id="logout" type="button">Odhlásiť</button>
       </div>
     </header>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" type="button" data-view="search">Vyhľadať VIN</button>
+      <button class="tab" type="button" data-view="stats">Prehľad mojich kampaní</button>
+    </nav>
+
+    <!-- PREHĽAD KAMPANÍ DEALERA -->
+    <div id="statsView" class="hidden">
+      <div class="st-head">
+        <div>
+          <h2 class="st-title">Prehľad kampaní</h2>
+          <div class="sub" id="stWho"></div>
+        </div>
+        <label class="st-dealer hidden" id="stDealerWrap">Dealer
+          <select id="stDealer"></select>
+        </label>
+      </div>
+      <div class="st-tyh">Typ kampane <span>– kliknutím na kartu zobrazíte prehľad len pre daný typ</span></div>
+      <div class="types" id="stTypes"></div>
+      <p class="meta st-typenote" id="stTypeNote"></p>
+      <div class="tiles" id="stTiles"></div>
+
+      <div class="card st-exp">
+        <div class="st-exp-h">Export nevykonaných vozidiel do Excelu</div>
+        <div class="st-exp-row">
+          <button class="exp-btn" id="stExpAll" type="button">⬇ Všetky nevykonané kampane</button>
+          <span class="st-exp-or">alebo</span>
+          <select id="stExpCamp"><option value="">Vyberte kampaň…</option></select>
+          <button class="exp-btn alt" id="stExpOne" type="button">⬇ Export kampane</button>
+        </div>
+        <div class="st-exp-note">Súbor obsahuje VIN, model, kampaň a jej typ, dátumy, číslo motora, číslo motora (DIGLAS) a začiatok záruky. Ukončené kampane sa neexportujú. <span id="stExpMsg" class="st-exp-msg"></span></div>
+      </div>
+
+      <h3 class="st-h3">Plnenie podľa kampane</h3>
+      <div class="card st-camps" id="stCamps"></div>
+
+      <h3 class="st-h3">Zoznam vozidiel</h3>
+      <div class="st-filters">
+        <select id="stCamp"><option value="">Všetky kampane</option></select>
+        <div class="seg" id="stState">
+          <button type="button" data-s="open" class="on">Nevykonané</button>
+          <button type="button" data-s="done">Vykonané</button>
+          <button type="button" data-s="all">Všetky</button>
+        </div>
+        <button class="ghost" id="stCsv" type="button">⬇ Stiahnuť zobrazený zoznam</button>
+      </div>
+      <p class="meta" id="stCount"></p>
+      <div class="st-list" id="stList"></div>
+    </div>
+
     <div id="searchView">
     <div class="search">
       <input id="q" placeholder="Zadajte VIN alebo jeho časť (napr. posledných 6 znakov)" autocomplete="off" spellcheck="false" maxlength="17">
@@ -136,6 +266,21 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
     <div id="newsView" class="hidden">
       <button class="back" id="btnBack" type="button">← Späť na vyhľadávanie VIN</button>
       <h2 class="news-title">Čo je nové?</h2>
+
+      <article class="news-entry">
+        <div class="news-date">12. 10. 2026</div>
+        <div class="news-new">
+          <div class="news-h"><span class="news-tag">NOVINKA</span> Nová záložka „Prehľad mojich kampaní“</div>
+          <ul>
+            <li><b>Súhrn</b> vykonaných a nevykonaných kampaní vašich vozidiel a celkové <b>plnenie v %</b></li>
+            <li><b>Prehľad podľa typu kampane</b> – všetky, zvolávacie, aktívne alebo pasívne</li>
+            <li><b>Plnenie podľa jednotlivých kampaní</b> – aj s typom kampane <span class="ctype ty-akt">aktívna</span> <span class="ctype ty-pas">pasívna</span> <span class="ctype ty-zvol">zvolávacia</span></li>
+            <li><b>Zoznam vozidiel</b> s filtrom podľa kampane a stavu (nevykonané / vykonané / všetky). Kliknutím na VIN sa otvorí jeho detail.</li>
+            <li><b>Export nevykonaných vozidiel do Excelu</b> – všetky nevykonané kampane naraz alebo po jednotlivých kampaniach</li>
+          </ul>
+          <p class="news-small">Typ kampane sa teraz zobrazuje aj pri vyhľadávaní VIN.</p>
+        </div>
+      </article>
 
       <article class="news-entry">
         <div class="news-date">9. 10. 2026</div>
@@ -210,13 +355,14 @@ function start(inner, id){
   $('who').textContent = `${inner.n} (${id})`;
   const vinCount = vins.length;
   $('meta').textContent = `Zoznam aktualizovaný ${fmtD(file.updated)} · ${vinCount.toLocaleString('sk-SK')} VIN v databáze. Zadajte aspoň 3 znaky.`;
-  $('q').value = ''; $('res').innerHTML = ''; $('q').focus();
+  $('q').value = ''; $('res').innerHTML = ''; showView('search');
   resetIdle();
 }
 function logout(msg){
   db = null; vins = null; who = null; file = null; ss.del('tuk'); ss.del('tuid');
   $('app').classList.add('hidden'); $('login').classList.remove('hidden');
   $('pin').value = ''; $('loginErr').textContent = msg || ''; $('res').innerHTML = '';
+  $('stDealer').innerHTML = ''; $('stDealerWrap').classList.add('hidden'); $('stList').innerHTML = '';
 }
 let idleT; function resetIdle(){ clearTimeout(idleT); idleT = setTimeout(() => logout('Boli ste odhlásený pre nečinnosť.'), IDLE_MIN*60000); }
 ['keydown','click','touchstart'].forEach(e => document.addEventListener(e, () => { if (who) resetIdle(); }, {passive:true}));
@@ -237,9 +383,173 @@ $('login').addEventListener('submit', async ev => {
   btn.disabled = false; btn.textContent = 'Prihlásiť';
 });
 $('logout').onclick = () => logout();
-function showNews(on){ $('newsView').classList.toggle('hidden', !on); $('searchView').classList.toggle('hidden', on); window.scrollTo(0,0); if(!on) $('q').focus(); }
+// ---- prepínanie obrazoviek: vyhľadávanie / prehľad / novinky ----
+function showView(name){
+  for (const [v, el] of [['search','searchView'],['stats','statsView'],['news','newsView']]) $(el).classList.toggle('hidden', v !== name);
+  $('tabs').classList.toggle('hidden', name === 'news');
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === name));
+  window.scrollTo(0,0);
+  if (name === 'search') $('q').focus();
+  if (name === 'stats') renderStats();
+}
+function showNews(on){ showView(on ? 'news' : 'search'); }
 $('btnNews').onclick = () => showNews(true);
 $('btnBack').onclick = () => showNews(false);
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => showView(t.dataset.view));
+
+// typ kampane ako štítok: aktívna / pasívna / zvolávacia
+function typeBadge(code){
+  const t = ((db.camps[code] || [])[1] || '').trim(); if (!t) return '';
+  const k = /zvol/i.test(t) ? 'ty-zvol' : /akt/i.test(t) ? 'ty-akt' : /pas/i.test(t) ? 'ty-pas' : 'ty-pas';
+  return `<span class="ctype ${k}">${esc(t)}</span>`;
+}
+// ---- PREHĽAD KAMPANÍ DEALERA ----
+let stState = 'open', stType = 'all';
+const TYPES = [['all','Všetky typy'],['zvol','Zvolávacie'],['akt','Aktívne'],['pas','Pasívne']];
+const typeKey = code => { const t = ((db.camps[code] || [])[1] || ''); return /zvol/i.test(t) ? 'zvol' : /akt/i.test(t) ? 'akt' : /pas/i.test(t) ? 'pas' : ''; };
+const inType = code => stType === 'all' || typeKey(code) === stType;
+const typeLabel = k => (TYPES.find(t => t[0] === k) || TYPES[0])[1];
+const campEnded = code => /ukon[cč]en/i.test((db.camps[code] || [])[5] || '');
+const vehModel = v => { const ms = v.camps.map(c => db.camps[c.code]?.[2]).filter(Boolean); return ms.find(m => !/r[oô]zne/i.test(m)) || ms[0] || ''; };
+function stDealerCode(){ return who.id === 'ADMIN' ? $('stDealer').value : who.id; }
+function stVehicles(){ const d = stDealerCode(); return vins.filter(v => v.camps.length && (!d || v.dealer === d)); }
+function renderStats(){
+  if (who.id === 'ADMIN' && !$('stDealer').options.length) {
+    const codes = [...new Set(vins.map(v => v.dealer).filter(Boolean))].sort();
+    $('stDealer').innerHTML = '<option value="">Všetci dealeri</option>' + codes.map(c => `<option value="${esc(c)}">${esc(c)}${db.dealers[c] && db.dealers[c] !== c ? ' – ' + esc(db.dealers[c]) : ''}</option>`).join('');
+    $('stDealerWrap').classList.remove('hidden');
+  }
+  const d = stDealerCode();
+  $('stWho').textContent = (d ? `${d}${db.dealers[d] ? ' – ' + db.dealers[d] : ''}` : 'Všetci dealeri') + ` · stav k ${fmtD(file.updated)}`;
+  $('stTypeNote').textContent = stType === 'all' ? '' : `Zobrazujú sa len ${typeLabel(stType).toLowerCase()} kampane.`;
+  const vs = stVehicles();
+  const per = new Map(); let done = 0, open = 0, vOpen = 0, vTot = 0;
+  const agg = Object.fromEntries(TYPES.map(([k]) => [k, {done:0, open:0}]));
+  for (const v of vs) {
+    let hasOpen = false, hasAny = false;
+    for (const c of v.camps) {
+      const en = campEnded(c.code), k = typeKey(c.code);
+      if (!en) for (const key of ['all', k]) if (agg[key]) { if (c.stav === 1) agg[key].done++; else agg[key].open++; }
+      if (!inType(c.code)) continue;
+      hasAny = true;
+      const p = per.get(c.code) || per.set(c.code, {code:c.code, done:0, open:0, ended:en}).get(c.code);
+      if (c.stav === 1) p.done++; else p.open++;
+      if (p.ended) continue;
+      if (c.stav === 1) done++; else { open++; hasOpen = true; }
+    }
+    if (hasOpen) vOpen++;
+    if (hasAny) vTot++;
+  }
+  $('stTypes').innerHTML = TYPES.map(([k, lbl]) => {
+    const a = agg[k], t = a.done + a.open, pc = t ? Math.round(a.done / t * 100) : 0;
+    return `<button type="button" class="tycard tc-${k}${stType === k ? ' on' : ''}" data-t="${k}" ${t ? '' : 'disabled'}>
+      <span class="tyl">${lbl}</span>
+      <span class="tyv">${a.open}<small> nevykonaných</small></span>
+      <span class="pbar"><span style="width:${pc}%"></span></span>
+      <span class="tys">plnenie ${pc} % · vykonané ${a.done} z ${t}</span></button>`;
+  }).join('');
+  $('stTypes').querySelectorAll('.tycard').forEach(b => b.onclick = () => { stType = b.dataset.t; $('stCamp').value = ''; renderStats(); });
+  const tot = done + open, pct = tot ? Math.round(done / tot * 100) : 0;
+  $('stTiles').innerHTML = `
+    <div class="tile"><div class="tl">Vozidlá s nevykonanou kampaňou</div><div class="tv">${vOpen}</div><div class="ts">z ${vTot} vozidiel s kampaňou</div></div>
+    <div class="tile t-open"><div class="tl">Nevykonané kampane</div><div class="tv">${open}</div><div class="ts">treba vykonať</div></div>
+    <div class="tile t-done"><div class="tl">Vykonané kampane</div><div class="tv">${done}</div><div class="ts">z ${tot} spolu</div></div>
+    <div class="tile"><div class="tl">Plnenie</div><div class="tv">${pct} %</div>
+      <div class="pbar" title="Vykonané ${done} z ${tot}"><span style="width:${pct}%"></span></div></div>`;
+  const rows = [...per.values()].sort((a,b) => (a.ended - b.ended) || (b.open - a.open) || a.code.localeCompare(b.code));
+  $('stCamps').innerHTML = rows.length ? rows.map(p => {
+    const t = p.done + p.open, w = t ? p.done / t * 100 : 0, nm = (db.camps[p.code] || [])[0] || '';
+    if (p.ended) return `<div class="crow ended"><div class="cinfo"><div class="chead"><span class="ccode">${esc(p.code)}</span>${typeBadge(p.code)}</div><div class="cnm">${esc(nm)}</div></div>
+      <div class="cnum"><span class="badge b-ended">Ukončená – nezapočítava sa</span><div class="cmeta">${t} vozidiel</div></div></div>`;
+    return `<div class="crow" data-code="${esc(p.code)}"><div class="cinfo"><div class="chead"><span class="ccode">${esc(p.code)}</span>${typeBadge(p.code)}</div><div class="cnm">${esc(nm)}</div>
+      <div class="pbar" title="${esc(p.code)}: vykonané ${p.done} z ${t}"><span style="width:${w}%"></span></div></div>
+      <div class="cnum">${p.open ? `<span class="badge b-open">Zostáva ${p.open}</span>` : '<span class="badge b-done">Hotovo</span>'}<div class="cmeta">vykonané ${p.done} z ${t}</div>
+      ${p.open ? `<button class="xbtn" type="button" data-exp="${esc(p.code)}" title="Stiahnuť nevykonané vozidlá tejto kampane do Excelu">⬇ Excel</button>` : ''}</div></div>`;
+  }).join('') : '<div class="empty">Pre tohto dealera nie sú v zozname žiadne kampane.</div>';
+  $('stCamps').querySelectorAll('.crow[data-code]').forEach(r => r.onclick = () => { $('stCamp').value = r.dataset.code; setState('open'); $('stList').scrollIntoView({behavior:'smooth'}); });
+  const cur = $('stCamp').value;
+  $('stCamp').innerHTML = '<option value="">Všetky kampane</option>' + rows.filter(p => !p.ended).map(p => `<option value="${esc(p.code)}">${esc(p.code)} – ${esc((db.camps[p.code] || [])[0] || '')}</option>`).join('');
+  if ([...$('stCamp').options].some(o => o.value === cur)) $('stCamp').value = cur;
+  $('stExpCamp').innerHTML = '<option value="">Vyberte kampaň…</option>' + rows.filter(p => !p.ended && p.open).map(p => `<option value="${esc(p.code)}">${esc(p.code)} – ${esc((db.camps[p.code] || [])[0] || '')} (${p.open})</option>`).join('');
+  $('stExpAll').innerHTML = stType === 'all' ? `⬇ Všetky nevykonané kampane (${open})` : `⬇ Všetky nevykonané ${typeLabel(stType).toLowerCase()} kampane (${open})`;
+  $('stCamps').querySelectorAll('.xbtn').forEach(b => b.onclick = e => { e.stopPropagation(); exportExcel(openItems(b.dataset.exp), expName(b.dataset.exp), b); });
+  renderStList();
+}
+function stItems(){
+  const camp = $('stCamp').value, out = [];
+  for (const v of stVehicles()) {
+    const cs = v.camps.filter(c => !campEnded(c.code) && inType(c.code) && (!camp || c.code === camp) && (stState === 'all' || (stState === 'open' ? c.stav !== 1 : c.stav === 1)));
+    if (cs.length) out.push({v, cs});
+  }
+  return out.sort((a,b) => a.v.vin.localeCompare(b.v.vin));
+}
+function renderStList(){
+  const items = stItems(), MAX = 300;
+  const lbl = {open:'s nevykonanou kampaňou', done:'s vykonanou kampaňou', all:'s kampaňou'}[stState];
+  $('stCount').textContent = `${items.length} vozidiel ${lbl}` + (items.length > MAX ? ` – zobrazujem prvých ${MAX}, celý zoznam stiahnete tlačidlom vyššie.` : '.');
+  $('stList').innerHTML = items.slice(0, MAX).map(({v, cs}) => `<div class="lrow">
+      <button class="lvin" type="button" data-vin="${esc(v.vin)}" title="Otvoriť detail VIN">${esc(v.vin)}</button>
+      <div class="lmodel">${esc(vehModel(v))}</div>
+      <div class="lchips">${cs.map(c => `<span class="chip ${c.stav === 1 ? 'ch-done' : 'ch-open'}" title="${esc((db.camps[c.code] || [])[0] || '')}">${esc(c.code)}</span>`).join('')}</div>
+    </div>`).join('') || '<div class="card empty">Žiadne vozidlá pre zvolený filter.</div>';
+  $('stList').querySelectorAll('.lvin').forEach(b => b.onclick = () => { showView('search'); $('q').value = b.dataset.vin; render(); });
+}
+function setState(s){ stState = s; document.querySelectorAll('#stState button').forEach(b => b.classList.toggle('on', b.dataset.s === s)); renderStList(); }
+document.querySelectorAll('#stState button').forEach(b => b.onclick = () => setState(b.dataset.s));
+$('stCamp').onchange = renderStList;
+$('stDealer').onchange = () => { $('stCamp').value = ''; renderStats(); };
+// ---- EXPORT DO EXCELU (.xlsx; pri chybe načítania knižnice CSV) ----
+let xlsxLib = null;
+function loadXlsx(){
+  if (window.XLSX) return Promise.resolve(window.XLSX);
+  return xlsxLib || (xlsxLib = new Promise((ok, err) => {
+    const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    sc.onload = () => ok(window.XLSX); sc.onerror = () => { xlsxLib = null; err(new Error('xlsx')); }; document.head.appendChild(sc);
+  }));
+}
+function exportRows(items){
+  const head = ['Kód dealera','Názov dealera','VIN','Model','Kód TU','Typ TU','Názov TU','Stav','Dátum vydania TU','Dátum pridania VIN','Číslo motora','Číslo motora (DIGLAS)','Začiatok plynutia záruky'];
+  const out = [head];
+  for (const {v, cs} of items) for (const c of cs) {
+    const d = db.camps[c.code] || [], vx = (db.veh && db.veh[v.vin]) || [];
+    const zar = /^\d{4}-\d{2}-\d{2}$/.test(vx[0] || '') ? fmtD(vx[0]) : (vx[0] || '');
+    out.push([v.dealer || '', db.dealers[v.dealer] || '', v.vin, vehModel(v), c.code, d[1] || '', d[0] || '', c.stav === 1 ? 'vykonaná' : 'nevykonaná', fmtD(d[4]), fmtD(c.added), vx[1] || '', vx[2] || '', zar]);
+  }
+  return out;
+}
+async function exportExcel(items, name, btn){
+  if (!items.length) { alertBox('Nie sú žiadne vozidlá na export.'); return; }
+  const rows = exportRows(items), old = btn && btn.innerHTML;
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span>Pripravujem…'; }
+  try {
+    const X = await loadXlsx();
+    const ws = X.utils.aoa_to_sheet(rows);
+    ws['!cols'] = rows[0].map((h, i) => ({wch: Math.min(60, Math.max(h.length, ...rows.slice(1).map(r => String(r[i]).length)) + 2)}));
+    ws['!autofilter'] = {ref: X.utils.encode_range({s:{r:0,c:0}, e:{r:rows.length-1, c:rows[0].length-1}})};
+    const wb = X.utils.book_new(); X.utils.book_append_sheet(wb, ws, 'Nevykonané');
+    X.writeFile(wb, name + '.xlsx');
+  } catch(e) {
+    const q = x => '"' + String(x ?? '').replace(/"/g, '""') + '"';
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['﻿' + rows.map(r => r.map(q).join(';')).join('\r\n')], {type:'text/csv;charset=utf-8'}));
+    a.download = name + '.csv'; a.click();
+  }
+  if (btn) { btn.disabled = false; btn.innerHTML = old; }
+}
+function alertBox(msg){ $('stExpMsg').textContent = msg; setTimeout(() => $('stExpMsg').textContent = '', 4000); }
+// nevykonané (bez ukončených kampaní), voliteľne len jedna kampaň
+function openItems(code){
+  const out = [];
+  for (const v of stVehicles()) {
+    const cs = v.camps.filter(c => c.stav !== 1 && !campEnded(c.code) && (code ? c.code === code : inType(c.code)));
+    if (cs.length) out.push({v, cs});
+  }
+  return out.sort((a,b) => a.v.vin.localeCompare(b.v.vin));
+}
+const expName = code => `nevykonane_${code || (stType === 'all' ? 'vsetky_kampane' : typeLabel(stType).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'') + '_kampane')}_${stDealerCode() || 'vsetci_dealeri'}_${file.updated}`;
+$('stExpAll').onclick = e => exportExcel(openItems(''), expName(''), e.currentTarget);
+$('stExpOne').onclick = e => { const c = $('stExpCamp').value; if (!c) { alertBox('Najprv vyberte kampaň.'); return; } exportExcel(openItems(c), expName(c), e.currentTarget); };
+$('stCsv').onclick = e => exportExcel(stItems(), `zoznam_${$('stCamp').value || 'vsetky'}_${stState}_${stDealerCode() || 'vsetci'}_${file.updated}`, e.currentTarget);
 
 // poznámka: bežné písmo, tučne len úvod "Dôležité:", slová VEĽKÝMI písmenami a kódy kampaní
 function fmtNote(t){
@@ -293,8 +603,8 @@ function render(){
         const ended = isEnded(c), note = d[5] || '';
         const st = ended ? '<span class="badge b-ended">Ukončená – nevykonávať</span>'
           : c.stav === 1 ? '<span class="badge b-done">Vykonané</span>' : '<span class="badge b-open">Potrebné vykonať</span>';
-        html += `<div class="camp${ended ? ' ended' : ''}"><div><div class="tbcode">${esc(c.code)}</div><div class="cname">${esc(d[0] || c.code)}</div>
-          <div class="cmeta">${[d[1] && ('typ: ' + d[1]), d[4] && ('vydané ' + fmtD(d[4])), c.added && ('VIN pridané do zoznamu ' + fmtD(c.added))].filter(Boolean).map(esc).join(' · ')}</div>
+        html += `<div class="camp${ended ? ' ended' : ''}"><div><div class="chead"><span class="tbcode">${esc(c.code)}</span>${typeBadge(c.code)}</div><div class="cname">${esc(d[0] || c.code)}</div>
+          <div class="cmeta">${[d[4] && ('vydané ' + fmtD(d[4])), c.added && ('VIN pridané do zoznamu ' + fmtD(c.added))].filter(Boolean).map(esc).join(' · ')}</div>
           ${note ? `<div class="cnote">⚠ ${fmtNote(note)}</div>` : ''}</div>
           ${st}</div>`;
       }
