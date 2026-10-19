@@ -70,6 +70,8 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 .news-entry ul{margin:4px 0 0;padding-left:20px}.news-entry li{margin:3px 0}
 .news-entry p{margin:0;font-size:15px}
 .news-entry li .ctype{font-size:11px;padding:2px 7px;vertical-align:1px}
+.news-camps{list-style:none;padding-left:0!important}.news-camps li{padding:8px 0;border-bottom:1px dashed var(--line)}.news-camps li:last-child{border-bottom:0}
+.news-camps .news-tb{color:var(--accent);font-size:19px}
 .news-small{margin-top:8px!important;color:var(--muted)}
 .news-tb{font:800 18px/1 ui-monospace,Consolas,monospace}
 .news-entry p.news-repl{margin-top:8px;padding-top:8px;border-top:1px dashed var(--err)}
@@ -266,6 +268,19 @@ select{padding:9px 10px;border:1px solid var(--line);border-radius:8px;backgroun
     <div id="newsView" class="hidden">
       <button class="back" id="btnBack" type="button">← Späť na vyhľadávanie VIN</button>
       <h2 class="news-title">Čo je nové?</h2>
+
+      <article class="news-entry">
+        <div class="news-date">19. 10. 2026</div>
+        <div class="news-new">
+          <div class="news-h"><span class="news-tag">NOVÉ KAMPANE</span> Do zoznamu pribudli nové kampane:</div>
+          <ul class="news-camps">
+            <li><span class="news-tb">TB20261015001</span> <span class="ctype ty-akt">aktívna</span><br>Problém nadprúdovej ochrany BMS pri vysokých teplotách</li>
+            <li><span class="news-tb">TB20261013001</span> <span class="ctype ty-pas">pasívna</span><br>Kontrola skrutiek príruby kardanového hriadeľa na zadnom diferenciáli</li>
+            <li><span class="news-tb">TB20260909001</span> <span class="ctype ty-akt">aktívna</span><br>Aktualizácia logiky aktivácie osvetlenia podľa predpisu UN R48.08 pre vybrané modely</li>
+          </ul>
+          <p class="news-small">Či sa kampaň týka vášho vozidla, zistíte vyhľadaním VIN. Vaše vozidlá s týmito kampaňami nájdete v záložke „Prehľad mojich kampaní“.</p>
+        </div>
+      </article>
 
       <article class="news-entry">
         <div class="news-date">12. 10. 2026</div>
