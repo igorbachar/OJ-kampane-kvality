@@ -270,6 +270,15 @@ select{padding:9px 10px;border:1px solid var(--line);border-radius:8px;backgroun
       <h2 class="news-title">Čo je nové?</h2>
 
       <article class="news-entry">
+        <div class="news-date">20. 10. 2026</div>
+        <div class="news-warn">
+          <div class="news-h"><span class="news-tag warn">DÔLEŽITÉ</span> Kampaň <span class="news-tb">TB20260909001</span> je dočasne <u>POZASTAVENÁ</u></div>
+          <p>Aktualizácia logiky aktivácie osvetlenia podľa predpisu UN R48.08 pre vybrané modely. <b>Nevykonávajte ju a ani ju neuplatňujte do systému.</b> Nebude preplatená.</p>
+          <p class="news-repl">Kampaň je stiahnutá aj z dealerského portálu.</p>
+        </div>
+      </article>
+
+      <article class="news-entry">
         <div class="news-date">19. 10. 2026</div>
         <div class="news-new">
           <div class="news-h"><span class="news-tag">NOVÉ KAMPANE</span> Do zoznamu pribudli nové kampane:</div>
@@ -424,7 +433,9 @@ const TYPES = [['all','Všetky typy'],['zvol','Zvolávacie'],['akt','Aktívne'],
 const typeKey = code => { const t = ((db.camps[code] || [])[1] || ''); return /zvol/i.test(t) ? 'zvol' : /akt/i.test(t) ? 'akt' : /pas/i.test(t) ? 'pas' : ''; };
 const inType = code => stType === 'all' || typeKey(code) === stType;
 const typeLabel = k => (TYPES.find(t => t[0] === k) || TYPES[0])[1];
-const campEnded = code => /ukon[cč]en/i.test((db.camps[code] || [])[5] || '');
+const campStop = code => { const n = (db.camps[code] || [])[5] || ''; return /pozastaven/i.test(n) ? 'paused' : /ukon[cč]en/i.test(n) ? 'ended' : ''; };
+const campEnded = code => !!campStop(code);   // ukončená alebo pozastavená – nevykonávať, nezapočítava sa
+const stopLabel = code => campStop(code) === 'paused' ? 'Pozastavená' : 'Ukončená';
 const vehModel = v => { const ms = v.camps.map(c => db.camps[c.code]?.[2]).filter(Boolean); return ms.find(m => !/r[oô]zne/i.test(m)) || ms[0] || ''; };
 function stDealerCode(){ return who.id === 'ADMIN' ? $('stDealer').value : who.id; }
 function stVehicles(){ const d = stDealerCode(); return vins.filter(v => v.camps.length && (!d || v.dealer === d)); }
@@ -475,7 +486,7 @@ function renderStats(){
   $('stCamps').innerHTML = rows.length ? rows.map(p => {
     const t = p.done + p.open, w = t ? p.done / t * 100 : 0, nm = (db.camps[p.code] || [])[0] || '';
     if (p.ended) return `<div class="crow ended"><div class="cinfo"><div class="chead"><span class="ccode">${esc(p.code)}</span>${typeBadge(p.code)}</div><div class="cnm">${esc(nm)}</div></div>
-      <div class="cnum"><span class="badge b-ended">Ukončená – nezapočítava sa</span><div class="cmeta">${t} vozidiel</div></div></div>`;
+      <div class="cnum"><span class="badge b-ended">${stopLabel(p.code)} – nezapočítava sa</span><div class="cmeta">${t} vozidiel</div></div></div>`;
     return `<div class="crow" data-code="${esc(p.code)}"><div class="cinfo"><div class="chead"><span class="ccode">${esc(p.code)}</span>${typeBadge(p.code)}</div><div class="cnm">${esc(nm)}</div>
       <div class="pbar" title="${esc(p.code)}: vykonané ${p.done} z ${t}"><span style="width:${w}%"></span></div></div>
       <div class="cnum">${p.open ? `<span class="badge b-open">Zostáva ${p.open}</span>` : '<span class="badge b-done">Hotovo</span>'}<div class="cmeta">vykonané ${p.done} z ${t}</div>
@@ -588,7 +599,7 @@ function render(){
   hits.sort((a,b) => (b.vin.endsWith(q) - a.vin.endsWith(q)) || a.vin.localeCompare(b.vin));
   let html = hits.length > MAX ? `<p class="meta" style="margin:0">Nájdených ${hits.length} VIN, zobrazujem prvých ${MAX}. Zadajte viac znakov.</p>` : (hits.length > 1 ? `<p class="meta" style="margin:0">Nájdených ${hits.length} VIN.</p>` : '');
   for (const v of hits.slice(0, MAX)){
-    const isEnded = c => /ukon[cč]en/i.test((db.camps[c.code] || [])[5] || '');
+    const isEnded = c => campEnded(c.code);
     const open = v.camps.filter(c => c.stav === 0 && !isEnded(c)).length;
     const active = v.camps.filter(c => !isEnded(c)).length;
     const camps = v.camps.slice().sort((a,b) => (isEnded(a) - isEnded(b)) || (a.stav - b.stav) || a.code.localeCompare(b.code));
@@ -596,7 +607,7 @@ function render(){
     let badge;
     if (!v.camps.length) badge = '<span class="badge b-none">Bez kampane</span>';
     else if (open) badge = `<span class="badge b-open">Otvorené kampane: ${open}</span>`;
-    else if (!active) badge = '<span class="badge b-none">Iba ukončené kampane</span>';
+    else if (!active) badge = '<span class="badge b-none">Iba ukončené / pozastavené kampane</span>';
     else badge = '<span class="badge b-done">Všetky kampane vykonané</span>';
     const dn = db.dealers[v.dealer];
     const dealerName = v.dealer ? (dn && dn !== v.dealer ? `${v.dealer} – ${dn}` : v.dealer) : '';
@@ -616,7 +627,7 @@ function render(){
       for (const c of camps){
         const d = db.camps[c.code] || [];
         const ended = isEnded(c), note = d[5] || '';
-        const st = ended ? '<span class="badge b-ended">Ukončená – nevykonávať</span>'
+        const st = ended ? `<span class="badge b-ended">${stopLabel(c.code)} – nevykonávať</span>`
           : c.stav === 1 ? '<span class="badge b-done">Vykonané</span>' : '<span class="badge b-open">Potrebné vykonať</span>';
         html += `<div class="camp${ended ? ' ended' : ''}"><div><div class="chead"><span class="tbcode">${esc(c.code)}</span>${typeBadge(c.code)}</div><div class="cname">${esc(d[0] || c.code)}</div>
           <div class="cmeta">${[d[4] && ('vydané ' + fmtD(d[4])), c.added && ('VIN pridané do zoznamu ' + fmtD(c.added))].filter(Boolean).map(esc).join(' · ')}</div>
