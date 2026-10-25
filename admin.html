@@ -79,7 +79,8 @@ function readSheet(file){
 const s = v => v==null ? '' : String(v).trim();
 const fmtDate = v => {
   if (!(v instanceof Date) || isNaN(v)) return '';
-  const d = new Date(v.getTime() + 60e3);   // ochrana pred zaokrúhlením typu 23:59:59
+  const d = new Date(v.getTime() + 60e3);
+  if (d.getFullYear() < 2000) return '';   // prázdny dátum (Excel čas 0:00) – nezobrazovať   // ochrana pred zaokrúhlením typu 23:59:59
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 };
 
@@ -129,7 +130,7 @@ go.onclick = async () => {
       if (!/^TB\d/i.test(tu)) tu = '';               // "nemá kampaň"
       if (tu && (!camps[tu] || !camps[tu][4])) {
         const m = tu.match(/^TB(\d{4})(\d{2})(\d{2})/i);
-        const issued = fmtDate(g(r,'vydane')) || (m ? `${m[1]}-${m[2]}-${m[3]}` : '');
+        const issued = C.vydane >= 0 ? fmtDate(g(r,'vydane')) : (m ? `${m[1]}-${m[2]}-${m[3]}` : '');   // prázdny dátum v Exceli = nezobrazovať
         camps[tu] = [s(g(r,'nazov')), s(g(r,'typ')), s(g(r,'model')), s(g(r,'mkod')), issued, (camps[tu] && camps[tu][5]) || ''];
       }
       if (tu && !camps[tu][5] && s(g(r,'pozn'))) camps[tu][5] = s(g(r,'pozn'));   // poznámka ku kampani
