@@ -48,6 +48,10 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 .cnote{margin-top:8px;padding:9px 12px;border-radius:8px;border:2px solid var(--err);background:var(--err-bg);color:var(--err);font-weight:400;font-size:15px;line-height:1.45}
 .cnote b{font-weight:800}
 .cnote-info{border-color:var(--none);background:var(--none-bg);color:var(--none)}
+.nd-tag{display:inline-block;margin-left:6px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:999px;background:var(--open-bg);color:var(--open);border:1px dashed var(--open)}
+.st-deliv{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:-4px 0 14px;font-size:13px;color:var(--muted)}
+.st-chk{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink);cursor:pointer}
+.st-chk input{width:16px;height:16px;padding:0}
 .cnote .ntb{font:800 16px/1 ui-monospace,Consolas,monospace}
 .camp.ended .tbcode,.camp.ended .cname{text-decoration:line-through;text-decoration-thickness:2px;opacity:.6}
 .camp.ended .tbcode{text-decoration-color:var(--err)}
@@ -77,6 +81,9 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 .news-camps{list-style:none;padding-left:0!important}.news-camps li{padding:8px 0;border-bottom:1px dashed var(--line)}.news-camps li:last-child{border-bottom:0}
 .news-camps .news-tb{color:var(--accent);font-size:19px}
 .news-entry p.news-done{margin-top:10px;padding:8px 12px;border-radius:8px;background:var(--done-bg);color:var(--done);border:2px solid var(--done);font-weight:600}
+.news-replace{margin:8px 0 2px;padding:9px 12px;border-radius:8px;background:var(--done-bg);border:2px solid var(--done);color:var(--ink);font-size:14px;line-height:1.5}
+.news-replace b{color:var(--done)}
+.news-tb-old{font:800 15px/1 ui-monospace,Consolas,monospace;text-decoration:line-through;text-decoration-thickness:2px;opacity:.75}
 .news-small{margin-top:8px!important;color:var(--muted)}
 .news-tb{font:800 18px/1 ui-monospace,Consolas,monospace}
 .news-entry p.news-repl{margin-top:8px;padding-top:8px;border-top:1px dashed var(--err)}
@@ -228,6 +235,10 @@ select{padding:9px 10px;border:1px solid var(--line);border-radius:8px;backgroun
           <select id="stDealer"></select>
         </label>
       </div>
+      <div class="st-deliv" id="stDeliv">
+        <span id="stDelivTxt"></span>
+        <label class="st-chk"><input type="checkbox" id="stInclND"> zobraziť aj nedodané vozidlá</label>
+      </div>
       <div class="st-tyh">Typ kampane <span>– kliknutím na kartu zobrazíte prehľad len pre daný typ</span></div>
       <div class="types" id="stTypes"></div>
       <p class="meta st-typenote" id="stTypeNote"></p>
@@ -273,6 +284,27 @@ select{padding:9px 10px;border:1px solid var(--line);border-radius:8px;backgroun
     <div id="newsView" class="hidden">
       <button class="back" id="btnBack" type="button">← Späť na vyhľadávanie VIN</button>
       <h2 class="news-title">Čo je nové?</h2>
+
+      <article class="news-entry">
+        <div class="news-date">22. 11. 2026</div>
+        <div class="news-new">
+          <div class="news-h"><span class="news-tag">NOVÉ KAMPANE</span> Do zoznamu pribudli 3 nové kampane:</div>
+          <ul class="news-camps">
+            <li><span class="news-tb">TB20261028001</span> <span class="ctype ty-akt">aktívna</span><br>Dotiahnutie skrutiek kardanového hriadeľa a zadného diferenciálu (OMODA 7 AWD)
+              <div class="news-replace">
+                <b>Nahrádza pôvodnú pasívnu kampaň <span class="news-tb-old">TB20261013001</span></b> – Kontrola skrutiek príruby kardanového hriadeľa na zadnom diferenciáli.<br>
+                Vozidlá, pri ktorých bola vykonaná pôvodná kampaň TB20261013001, sa <b>započítavajú ako vykonané aj v kampani TB20261028001</b>.
+              </div>
+            </li>
+            <li><span class="news-tb">TB20261027001</span> <span class="ctype ty-pas">pasívna</span><br>Abnormálny hluk z diferenciálu redukčnej prevodovky (pískanie ozubenia) (OMODA 5 BEV, JAECOO 5 BEV)</li>
+            <li><span class="news-tb">TB20261103001</span> <span class="ctype ty-pas">pasívna</span><br>Pokles výkonu a hluk z prevodovky (JAECOO 5 HEV)</li>
+          </ul>
+        </div>
+        <div class="news-new">
+          <div class="news-h"><span class="news-tag">ZMENA</span> Vyhodnotenie v záložke „Prehľad mojich kampaní“</div>
+          <p>Do plnenia kampaní sa po novom započítavajú len vozidlá <b>dodané dealerovi</b>. Vozidlá, ktoré vám ešte neboli dodané, si môžete zobraziť zaškrtnutím voľby „zobraziť aj nedodané vozidlá“. Pri vyhľadaní VIN sú označené štítkom <span class="nd-tag" style="margin-left:0">Nedodané dealerovi</span>.</p>
+        </div>
+      </article>
 
       <article class="news-entry">
         <div class="news-date">27. 10. 2026</div>
@@ -422,7 +454,7 @@ function logout(msg){
   db = null; vins = null; who = null; file = null; ss.del('tuk'); ss.del('tuid');
   $('app').classList.add('hidden'); $('login').classList.remove('hidden');
   $('pin').value = ''; $('loginErr').textContent = msg || ''; $('res').innerHTML = '';
-  $('stDealer').innerHTML = ''; $('stDealerWrap').classList.add('hidden'); $('stList').innerHTML = '';
+  $('stDealer').innerHTML = ''; $('stDealerWrap').classList.add('hidden'); $('stList').innerHTML = ''; $('stInclND').checked = false;
 }
 let idleT; function resetIdle(){ clearTimeout(idleT); idleT = setTimeout(() => logout('Boli ste odhlásený pre nečinnosť.'), IDLE_MIN*60000); }
 ['keydown','click','touchstart'].forEach(e => document.addEventListener(e, () => { if (who) resetIdle(); }, {passive:true}));
@@ -476,7 +508,9 @@ const stopCls = code => campStop(code) === 'prep' ? ' prep' : ' ended';
 const stopBadge = code => campStop(code) === 'prep' ? 'b-prep' : 'b-ended';
 const vehModel = v => { const ms = v.camps.map(c => db.camps[c.code]?.[2]).filter(Boolean); return ms.find(m => !/r[oô]zne/i.test(m)) || ms[0] || ''; };
 function stDealerCode(){ return who.id === 'ADMIN' ? $('stDealer').value : who.id; }
-function stVehicles(){ const d = stDealerCode(); return vins.filter(v => v.camps.length && (!d || v.dealer === d)); }
+const isNedod = v => ((db.veh && db.veh[v.vin]) || [])[3] === 'N';   // DODANIE DEALEROVI = Nedodané
+function stVehiclesAll(){ const d = stDealerCode(); return vins.filter(v => v.camps.length && (!d || v.dealer === d)); }
+function stVehicles(){ const inc = $('stInclND').checked; return stVehiclesAll().filter(v => inc || !isNedod(v)); }
 function renderStats(){
   if (who.id === 'ADMIN' && !$('stDealer').options.length) {
     const codes = [...new Set(vins.map(v => v.dealer).filter(Boolean))].sort();
@@ -487,6 +521,10 @@ function renderStats(){
   $('stWho').textContent = (d ? `${d}${db.dealers[d] ? ' – ' + db.dealers[d] : ''}` : 'Všetci dealeri') + ` · stav k ${fmtD(file.updated)}`;
   $('stTypeNote').textContent = stType === 'all' ? '' : `Zobrazujú sa len ${typeLabel(stType).toLowerCase()} kampane.`;
   const vs = stVehicles();
+  const nd = stVehiclesAll().filter(isNedod).length;
+  $('stDelivTxt').innerHTML = $('stInclND').checked
+    ? `<b>Zahrnuté sú aj nedodané vozidlá</b> (${nd}) – vrátane vozidiel, ktoré ešte neboli dodané dealerovi.`
+    : `Vyhodnotenie zahŕňa len vozidlá <b>dodané dealerovi</b>.` + (nd ? ` Nedodané vozidlá s kampaňou (${nd}) sa nezapočítavajú.` : '');
   const per = new Map(); let done = 0, open = 0, vOpen = 0, vTot = 0;
   const agg = Object.fromEntries(TYPES.map(([k]) => [k, {done:0, open:0}]));
   for (const v of vs) {
@@ -562,6 +600,7 @@ function setState(s){ stState = s; document.querySelectorAll('#stState button').
 document.querySelectorAll('#stState button').forEach(b => b.onclick = () => setState(b.dataset.s));
 $('stCamp').onchange = renderStList;
 $('stDealer').onchange = () => { $('stCamp').value = ''; renderStats(); };
+$('stInclND').onchange = () => renderStats();
 // ---- EXPORT DO EXCELU (.xlsx; pri chybe načítania knižnice CSV) ----
 let xlsxLib = null;
 function loadXlsx(){
@@ -572,12 +611,12 @@ function loadXlsx(){
   }));
 }
 function exportRows(items){
-  const head = ['Kód dealera','Názov dealera','VIN','Model','Kód TU','Typ TU','Názov TU','Stav','Dátum vydania TU','Dátum pridania VIN','Číslo motora','Číslo motora (DIGLAS)','Začiatok plynutia záruky'];
+  const head = ['Kód dealera','Názov dealera','VIN','Model','Kód TU','Typ TU','Názov TU','Stav','Dátum vydania TU','Dátum pridania VIN','Číslo motora','Číslo motora (DIGLAS)','Začiatok plynutia záruky','Dodanie dealerovi'];
   const out = [head];
   for (const {v, cs} of items) for (const c of cs) {
     const d = db.camps[c.code] || [], vx = (db.veh && db.veh[v.vin]) || [];
     const zar = /^\d{4}-\d{2}-\d{2}$/.test(vx[0] || '') ? fmtD(vx[0]) : (vx[0] || '');
-    out.push([v.dealer || '', db.dealers[v.dealer] || '', v.vin, vehModel(v), c.code, d[1] || '', d[0] || '', c.stav === 1 ? 'vykonaná' : 'nevykonaná', fmtD(d[4]), fmtD(c.added), vx[1] || '', vx[2] || '', zar]);
+    out.push([v.dealer || '', db.dealers[v.dealer] || '', v.vin, vehModel(v), c.code, d[1] || '', d[0] || '', c.stav === 1 ? 'vykonaná' : 'nevykonaná', fmtD(d[4]), fmtD(c.added), vx[1] || '', vx[2] || '', zar, isNedod(v) ? 'Nedodané' : 'Dodané']);
   }
   return out;
 }
@@ -650,7 +689,7 @@ function render(){
     const dn = db.dealers[v.dealer];
     const dealerName = v.dealer ? (dn && dn !== v.dealer ? `${v.dealer} – ${dn}` : v.dealer) : '';
     html += `<article class="veh"><div class="veh-top"><div><div class="vin">${hl(v.vin, q)}</div>
-      <div class="vsub">${[model, dealerName && ('Dealer: ' + dealerName)].filter(Boolean).map(esc).join(' · ')}</div></div>${badge}</div>`;
+      <div class="vsub">${[model, dealerName && ('Dealer: ' + dealerName)].filter(Boolean).map(esc).join(' · ')}${isNedod(v) ? ' <span class="nd-tag">Nedodané dealerovi</span>' : ''}</div></div>${badge}</div>`;
     const vx = (db.veh && db.veh[v.vin]) || ['', '', ''];
     if (vx[0] || vx[1] || vx[2]) {
       const zar = /^\d{4}-\d{2}-\d{2}$/.test(vx[0]) ? fmtD(vx[0]) : vx[0];
@@ -669,7 +708,7 @@ function render(){
           : c.stav === 1 ? '<span class="badge b-done">Vykonané</span>' : '<span class="badge b-open">Potrebné vykonať</span>';
         html += `<div class="camp${ended ? stopCls(c.code) : ''}"><div><div class="chead"><span class="tbcode">${esc(c.code)}</span>${typeBadge(c.code)}</div><div class="cname">${esc(d[0] || c.code)}</div>
           <div class="cmeta">${[d[4] && ('vydané ' + fmtD(d[4])), c.added && ('VIN pridané do zoznamu ' + fmtD(c.added))].filter(Boolean).map(esc).join(' · ')}</div>
-          ${note ? (campStop(c.code) === 'prep' ? `<div class="cnote cnote-info">ℹ ${fmtNote(note)}</div>` : `<div class="cnote">⚠ ${fmtNote(note)}</div>`) : ''}</div>
+          ${note ? ((campStop(c.code) === 'prep' || (!ended && /nahradil/i.test(note))) ? `<div class="cnote cnote-info">ℹ ${fmtNote(note)}</div>` : `<div class="cnote">⚠ ${fmtNote(note)}</div>`) : ''}</div>
           ${st}</div>`;
       }
       html += '</div>';
