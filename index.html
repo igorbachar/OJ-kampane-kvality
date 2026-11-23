@@ -48,6 +48,16 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 .cnote{margin-top:8px;padding:9px 12px;border-radius:8px;border:2px solid var(--err);background:var(--err-bg);color:var(--err);font-weight:400;font-size:15px;line-height:1.45}
 .cnote b{font-weight:800}
 .cnote-info{border-color:var(--none);background:var(--none-bg);color:var(--none)}
+.dstate{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:4px 10px;border-radius:999px;border:2px solid}
+.ds-d{background:var(--done-bg);color:var(--done);border-color:var(--done)}
+.ds-n{background:var(--open-bg);color:var(--open);border-color:var(--open);border-style:dashed}
+.dsub{font-weight:700;font-size:14px}
+.dcode{font:600 11px/1 ui-monospace,Consolas,monospace;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:5px;padding:3px 6px}
+.vstateB{display:inline-flex;flex-direction:column;gap:6px;margin-top:10px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.sbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.sbrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.sbmeta{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.sbmeta b{color:var(--ink)}
 .nd-tag{display:inline-block;margin-left:6px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:999px;background:var(--open-bg);color:var(--open);border:1px dashed var(--open)}
 .st-deliv{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:-4px 0 14px;font-size:13px;color:var(--muted)}
 .st-chk{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink);cursor:pointer}
@@ -302,7 +312,8 @@ select{padding:9px 10px;border:1px solid var(--line);border-radius:8px;backgroun
         </div>
         <div class="news-new">
           <div class="news-h"><span class="news-tag">ZMENA</span> Vyhodnotenie v záložke „Prehľad mojich kampaní“</div>
-          <p>Do plnenia kampaní sa po novom započítavajú len vozidlá <b>dodané dealerovi</b>. Vozidlá, ktoré vám ešte neboli dodané, si môžete zobraziť zaškrtnutím voľby „zobraziť aj nedodané vozidlá“. Pri vyhľadaní VIN sú označené štítkom <span class="nd-tag" style="margin-left:0">Nedodané dealerovi</span>.</p>
+          <p>Do plnenia kampaní sa po novom započítavajú len vozidlá <b>dodané dealerovi</b>. Vozidlá, ktoré vám ešte neboli dodané, si môžete zobraziť zaškrtnutím voľby „zobraziť aj nedodané vozidlá“. </p>
+          <p style="margin-top:8px">Pri vyhľadaní VIN teraz pri každom vozidle nájdete aj jeho <b>STATUS / STAV</b> – či je <span class="dstate ds-d" style="font-size:10px;padding:2px 7px">Dodané</span> alebo <span class="dstate ds-n" style="font-size:10px;padding:2px 7px">Nedodané</span>, jeho podstav (napr. Odovzdané zákazníkovi, Na ceste k dealerovi) a dátum statusu.</p>
         </div>
       </article>
 
@@ -662,6 +673,27 @@ function fmtNote(t){
   h = h.replace(/(^|[\s(])([A-ZÁÄČĎÉÍĹĽŇÓÔŔŠŤÚÝŽ]{4,})(?=[\s.,;:!)]|$)/g, '$1<b>$2</b>');
   return h;
 }
+// stav dodania + podstav (Status vozidla) pri VIN
+const STATUS_SK = [
+  [/DELIVERED TO THE FINAL/i, 'Odovzdané zákazníkovi', 'DELIVERED TO THE FINAL CUSTOMER'],
+  [/DEMO|COURTESY/i, 'Predvádzacie / náhradné vozidlo', 'DEMO / COURTESY REGISTRATION'],
+  [/DELIVERED TO DEALER/i, 'Dodané dealerovi', 'DELIVERED TO DEALER'],
+  [/IN TRANSPORT/i, 'Na ceste k dealerovi', 'IN TRANSPORT TO DEALER'],
+  [/READY TO DELIVER/i, 'Pripravené na dodanie dealerovi', 'READY TO DELIVER TO THE DEALER'],
+  [/WAREHOUSE/i, 'Na sklade importéra', 'ON WS WAREHOUSE'],
+  [/PRODUCED/i, 'Vyrobené, čaká na expedíciu', 'PRODUCED'],
+];
+function vehState(v){
+  const raw = (v.status || '').trim();
+  const nd = isNedod(v), m = STATUS_SK.find(x => x[0].test(raw));
+  const sub = m ? m[1] : raw, code = m ? (raw.slice(0, 2).match(/^[A-Z]-/) ? raw.slice(0, 2) : '') + m[2] : '';
+  const dt = v.statusDate ? esc(fmtD(v.statusDate)) : '';
+  return `<div class="vstateB">
+      <div class="sbl">Status / stav vozidla</div>
+      <div class="sbrow"><span class="dstate ${nd ? 'ds-n' : 'ds-d'}">${nd ? 'Nedodané' : 'Dodané'}</span>${sub ? `<span class="dsub">${esc(sub)}</span>` : ''}</div>
+      ${dt || code ? `<div class="sbmeta">${dt ? `Dátum statusu: <b>${dt}</b>` : ''}${code ? ` <span class="dcode">${esc(code)}</span>` : ''}</div>` : ''}
+    </div>`;
+}
 function hl(vin, q){
   const i = vin.indexOf(q); if (i < 0) return esc(vin);
   return esc(vin.slice(0,i)) + '<mark>' + esc(vin.slice(i, i+q.length)) + '</mark>' + esc(vin.slice(i+q.length));
@@ -689,7 +721,8 @@ function render(){
     const dn = db.dealers[v.dealer];
     const dealerName = v.dealer ? (dn && dn !== v.dealer ? `${v.dealer} – ${dn}` : v.dealer) : '';
     html += `<article class="veh"><div class="veh-top"><div><div class="vin">${hl(v.vin, q)}</div>
-      <div class="vsub">${[model, dealerName && ('Dealer: ' + dealerName)].filter(Boolean).map(esc).join(' · ')}${isNedod(v) ? ' <span class="nd-tag">Nedodané dealerovi</span>' : ''}</div></div>${badge}</div>`;
+      <div class="vsub">${[model, dealerName && ('Dealer: ' + dealerName)].filter(Boolean).map(esc).join(' · ')}</div>
+      ${vehState(v)}</div>${badge}</div>`;
     const vx = (db.veh && db.veh[v.vin]) || ['', '', ''];
     if (vx[0] || vx[1] || vx[2]) {
       const zar = /^\d{4}-\d{2}-\d{2}$/.test(vx[0]) ? fmtD(vx[0]) : vx[0];
